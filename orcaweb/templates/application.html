@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <div class="topnavtitle">Managing Application {{ application.Name }}</div>
+{% endblock %}
+{% block body %}
+
+    <script>
+        $(function () {
+            $("#Type").val("{{application.Type}}");
+
+            window.add_file = function () {
+                jQuery.post("/application/{{application.Name}}/files", {});
+                window.location = "";
+            };
+
+            window.edit_file = function (id) {
+                $("#editfilemodal").modal("show");
+                $.getJSON("/application/{{application.Name}}/files/" + id, function (data) {
+                    $("#filename").val(data["Command"]["Path"]);
+                    $("#filecontents").val(data["Command"]["Args"]);
+                    $("#fileid").val(data["Id"]);
+                });
+            };
+
+            window.save_file = function () {
+                jQuery.post("/application/{{application.Name}}/files/" + $("#fileid").val(), {
+                    "name": $("#filename").val(),
+                    "contents": $("#filecontents").val()
+                });
+                window.location = "";
+            };
+
+            window.delete_file = function (id) {
+                jQuery.ajax({
+                    url: '/application/{{application.Name}}/files/' + id,
+                    type: 'DELETE'
+                });
+                window.location = "";
+            };
+
+
+            window.add_health_check = function () {
+                jQuery.post("/application/{{application.Name}}/healthchecks", {});
+                window.location = "";
+            };
+
+            window.edit_health_check = function (id) {
+                $("#edithealthcheckmodal").modal("show");
+                $.getJSON("/application/{{application.Name}}/healthchecks/" + id, function (data) {
+                    $("#healthcheckpath").val(data["Command"]["Path"]);
+                    $("#healthcheckargs").val(data["Command"]["Args"]);
+                    $("#healthcheckid").val(data["Id"]);
+                });
+            };
+
+            window.save_health_check = function () {
+                jQuery.post("/application/{{application.Name}}/healthchecks/" + $("#healthcheckid").val(), {
+                    "path": $("#healthcheckpath").val(),
+                    "args": $("#healthcheckargs").val()
+                });
+                window.location = "";
+            };
+
+            window.delete_health_check = function (id) {
+                jQuery.ajax({
+                    url: '/application/{{application.Name}}/healthchecks/' + id,
+                    type: 'DELETE'
+                });
+                window.location = "";
+            };
+
+
+            window.add_install_command = function () {
+                jQuery.post("/application/{{application.Name}}/installcommands", {});
+                window.location = "";
+            };
+
+            window.edit_install_command = function (id) {
+                $("#editinstallcommandmodal").modal("show");
+                $.getJSON("/application/{{application.Name}}/installcommands/" + id, function (data) {
+                    $("#installcommandpath").val(data["Command"]["Path"]);
+                    $("#installcommandargs").val(data["Command"]["Args"]);
+                    $("#installcommandid").val(data["Id"]);
+                });
+            };
+
+            window.save_install_command = function () {
+                jQuery.post("/application/{{application.Name}}/installcommands/" + $("#installcommandid").val(), {
+                    "path": $("#installcommandpath").val(),
+                    "args": $("#installcommandargs").val()
+                });
+                window.location = "";
+            };
+
+            window.delete_install_command = function (id) {
+                jQuery.ajax({
+                    url: '/application/{{application.Name}}/installcommands/' + id,
+                    type: 'DELETE'
+                });
+                window.location = "";
+            };
+
+
+            window.add_remove_command = function () {
+                jQuery.post("/application/{{application.Name}}/removecommands", {});
+                window.location = "";
+            };
+
+            window.edit_remove_command = function (id) {
+                $("#editremovecommandmodal").modal("show");
+                $.getJSON("/application/{{application.Name}}/removecommands/" + id, function (data) {
+                    $("#removecommandpath").val(data["Command"]["Path"]);
+                    $("#removecommandargs").val(data["Command"]["Args"]);
+                    $("#removecommandid").val(data["Id"]);
+                });
+            };
+
+            window.save_remove_command = function () {
+                jQuery.post("/application/{{application.Name}}/removecommands/" + $("#removecommandid").val(), {
+                    "path": $("#removecommandpath").val(),
+                    "args": $("#removecommandargs").val()
+                });
+                window.location = "";
+            };
+
+            window.delete_remove_command = function (id) {
+                jQuery.ajax({
+                    url: '/application/{{application.Name}}/removecommands/' + id,
+                    type: 'DELETE'
+                });
+                window.location = "";
+            };
+        });
+    </script>
+    <br>
+    <div class="subtitle">Scaling Configuration</div>
+    <form method="POST">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" disabled class="form-control" value="{{ application.Name }}">
+                </div>
+                <div class="form-group">
+                    <label>Type</label>
+                    <select class="form-control" name="Type" id="Type">
+                        <option value="worker">Worker</option>
+                        <option value="http">Http</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Min</label>
+                    <input type="text" class="form-control" value="{{ application.MinDeploymentCount }}"
+                           name="MinDeploymentCount">
+                </div>
+                <div class="form-group">
+                    <label>TargetDeploymentCount</label>
+                    <input type="text" class="form-control" value="{{ application.TargetDeploymentCount }}"
+                           name="TargetDeploymentCount">
+                </div>
+            </div>
+        </div>
+
+        <div class="subtitle">Docker Configuration</div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label>Docker Repository</label>
+                    <input type="text" class="form-control" value="{{ application.DockerConfig.Repository }}"
+                           name="Repository">
+                </div>
+                <div class="form-group">
+                    <label>Docker Tag</label>
+                    <input type="text" class="form-control" value="{{ application.DockerConfig.Tag }}" name="Tag">
+                </div>
+                <div class="form-group">
+                    <label>Docker Reference</label>
+                    <input type="text" class="form-control" value="{{ application.DockerConfig.Reference }}"
+                           name="Reference">
+                </div>
+            </div>
+        </div>
+        <div class="subtitle">Network Configuration</div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label>Load Balancer</label>
+                    <input type="text" class="form-control" value="{{ application.LoadBalancer }}" name="LoadBalancer">
+                </div>
+                <div class="form-group">
+                    <label>VPC/Network</label>
+                    <input type="text" class="form-control" value="{{ application.Network }}" name="Network">
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-default">Save Settings</button>
+    </form>
+
+{% endblock %}
