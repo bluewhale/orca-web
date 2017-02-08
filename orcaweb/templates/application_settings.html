@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <div>
+        <div class="topnavtitle">
+            Managing Application {{ name }}
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <script>
+        window.toggle_main_nav("leftnav_applications");
+    </script>
+    <br>
+    <style>
+        .minor-navitem {
+            display: inline-table;
+            padding-right: 10px;
+            font-size: 15px;
+            color: gray;
+        }
+
+        .selected {
+            font-weight: 500;
+        }
+
+        .minor-navbar {
+            padding-bottom: 10px;
+            border-bottom: solid 1px whitesmoke;;
+        }
+    </style>
+    <div class="row">
+        <div class="minor-navbar">
+            {% include "application_navbar.html" %}
+                        <script>
+                $("#scaling-nav").addClass("selected")
+            </script>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <div ng-app="ApplicationSettings" class="row">
+        <div ng-controller="Main as main">
+            <form ng-submit="main.save()">
+                <div class="row configuration_row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Scaling Configuration</div>
+                        <div class="subtext">
+                            Configure application type and scaling min/max values.
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" disabled class="form-control" ng-model="main.application.Name">
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select class="form-control">
+                                <option value="http">Http</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Min</label>
+                            <input type="number" class="form-control"
+                                   ng-model="main.application.MinDeployment">
+                        </div>
+                        <div class="form-group">
+                            <label>Desired</label>
+                            <input type="number" class="form-control"
+                                   ng-model="main.application.DesiredDeployment">
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+                <button type="submit" class="btn btn-default">Save Settings</button>
+                <br><br>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        angular.module("ApplicationSettings", []).controller("Main", ["$http", function ($http) {
+            var self = this;
+            self.application = {};
+
+            var get_application = function () {
+                return $http.get("/ajax/application/{{ name }}").then(
+                        function (response) {
+                            self.application = response.data
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+            get_application();
+            self.save = function () {
+                $http.post("/ajax/application/{{ name }}", self.application).then(function (response) {
+                    get_application();
+                });
+            };
+        }]);
+
+    </script>
+{% endblock %}

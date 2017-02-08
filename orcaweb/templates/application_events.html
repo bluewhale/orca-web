@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <div>
+        <div class="topnavtitle">
+            Managing Application {{ name }}
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <script>
+        window.toggle_main_nav("leftnav_applications");
+    </script>
+    <br>
+    <style>
+        .minor-navitem {
+            display: inline-table;
+            padding-right: 10px;
+            font-size: 15px;
+            color: gray;
+        }
+
+        .selected {
+            font-weight: 500;
+        }
+
+        .minor-navbar {
+            padding-bottom: 10px;
+            border-bottom: solid 1px whitesmoke;;
+        }
+
+        .statpill {
+            border-radius: 3px;
+        }
+
+        .statpill-metric {
+            font-size: 30px;
+        }
+
+        .statpill-name {
+            text-transform: uppercase;
+        }
+
+        .statpill-root {
+            padding-left: 0px !important;
+        }
+
+        .border-right {
+        }
+    </style>
+    <div class="row">
+        <div class="minor-navbar">
+            {% include "application_navbar.html" %}
+            <script>
+                $("#events-nav").addClass("selected")
+            </script>
+
+        </div>
+    </div>
+
+    <div ng-app="ApplicationSettings">
+        <div ng-controller="Main as main">
+            <div class="configuration_row row">
+                <div class="col-md-12">
+
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="event in main.events">
+                            <span ng-bind="event.Details.message"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        angular.module("ApplicationSettings", []).controller("Main", ["$http", function ($http) {
+            var self = this;
+            self.servers = [];
+
+            var get_events = function () {
+                return $http.get("/ajax/application/{{ name }}/events").then(
+                        function (response) {
+                            self.events = response.data.events;
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+
+            get_events();
+        }]);
+    </script>
+{% endblock %}

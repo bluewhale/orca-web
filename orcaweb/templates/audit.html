@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <div class="topnavtitle">Audit Trail</div>
+{% endblock %}
+{% block body %}
+    <script>
+        window.toggle_main_nav("leftnav_audit");
+    </script>
+    <br>
+
+    <ul class="list-group">
+        {% for event in audit %}
+
+            <li class="list-group-item">
+                <span>{{ event.Details.message }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

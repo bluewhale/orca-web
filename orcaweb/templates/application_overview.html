@@ -1,0 +1,303 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <div>
+        <div class="topnavtitle">
+            Managing Application {{ name }}
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+    <script>
+        window.toggle_main_nav("leftnav_applications");
+    </script>
+    <br>
+    <style>
+        .minor-navitem {
+            display: inline-table;
+            padding-right: 10px;
+            font-size: 15px;
+            color: gray;
+        }
+
+        .selected {
+            font-weight: 500;
+        }
+
+        .minor-navbar {
+            padding-bottom: 10px;
+            border-bottom: solid 1px whitesmoke;;
+        }
+
+        .statpill {
+            border-radius: 3px;
+        }
+
+        .statpill-metric {
+            font-size: 30px;
+        }
+
+        .statpill-name {
+            text-transform: uppercase;
+        }
+
+        .statpill-root {
+            padding-left: 0px !important;
+        }
+
+        .border-right {
+        }
+    </style>
+    <div class="row">
+        <div class="minor-navbar">
+            {% include "application_navbar.html" %}
+            <script>
+                $("#overview-nav").addClass("selected")
+            </script>
+        </div>
+    </div>
+
+    <div ng-app="ApplicationSettings">
+        <div ng-controller="Main as main">
+            <div class="configuration_row row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6 statpill-root border-right">
+                                    <div class="statpill">
+                                        <div class="statpill-name">Running Instances</div>
+                                        <div class="statpill-metric" ng-bind="main.current_servers_count"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 statpill-root border-right">
+                                    <h4>Statistics</h4>
+
+                                    <div>
+                                        <div class="statpill-name">Memory Utilisation</div>
+                                        <div class="statpill-metric" ng-bind="main.desired_servers_count"></div>
+                                        <div id="memory_graph" style="height:200px;"></div>
+                                    </div>
+
+                                    <div>
+                                        <div class="statpill-name">CPU Utilisation</div>
+                                        <div class="statpill-metric" ng-bind="main.desired_servers_count"></div>
+                                        <div id="cpu_graph" style="height:200px;"></div>
+                                    </div>
+                                    <div>
+                                        <div class="statpill-name">Network Utilisation</div>
+                                        <div id="network_graph" style="height:200px;"></div>
+                                    </div>
+                                    <div>
+                                        <div class="statpill-name">Instances</div>
+                                        <div id="count_graph" style="height:200px;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-md-4 statpill-root border-right">
+                            <h4>Instance Hosts</h4>
+
+                            <div ng-repeat="server in main.servers">
+                                <div ng-click="main.open_server(server.Id)">
+                                    <div ng-bind="server.Id"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        angular.module("ApplicationSettings", []).controller("Main", ["$http", function ($http) {
+            var self = this;
+            self.servers = [];
+            self.servers_desired = [];
+            self.current_servers_count = 0;
+            self.open_server = function (dudes) {
+                window.location = "/application/{{ name }}/server/" + dudes;
+            };
+
+            var get_current_servers = function () {
+                return $http.get("/ajax/servers").then(
+                        function (response) {
+                            self.servers = [];
+                            for (var i = 0; i < response.data.servers.length; i++) {
+                                var individual_server = response.data.servers[i];
+                                if (individual_server["Apps"]) {
+
+                                    for (var n = 0; n < individual_server["Apps"].length; n++) {
+                                        if (individual_server["Apps"][n]["Name"] == "{{ name }}") {
+                                            self.servers.push(individual_server);
+                                        }
+                                    }
+                                }
+
+                            }
+
+                            self.current_servers_count = self.servers.length;
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+
+            var get_memory_usage = function () {
+                return $http.get("/ajax/application/{{ name }}/servers/memory").then(
+                        function (response) {
+                            var running_count = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                running_count.push(response.data.memory[i]["InstanceCount"]);
+                            }
+
+                            Highcharts.chart('count_graph', {
+                                chart: {
+                                    type: 'areaspline'
+                                },
+                                title: {text: ''},
+                                exporting: {enabled: false},
+                                credits: {enabled: false},
+                                xAxis: {
+                                    visible: false
+                                },
+                                yAxis: {
+                                    visible: false
+                                },
+                                plotOptions: {
+                                    areaspline: {
+                                        fillOpacity: 0.5
+                                    }
+                                },
+                                series: [{
+                                    showInLegend: true,
+                                    data: running_count,
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    name: "Running"
+                                }]
+                            });
+
+
+                            var memory_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                memory_usage.push(response.data.memory[i]["Mbytes"]);
+                            }
+
+                            console.log(memory_usage);
+                            Highcharts.chart('memory_graph', {
+                                chart: {
+                                    type: 'areaspline'
+                                },
+                                title: {text: ''},
+                                exporting: {enabled: false},
+                                credits: {enabled: false},
+                                xAxis: {
+                                    visible: false
+                                },
+                                yAxis: {
+                                    visible: false
+                                },
+                                plotOptions: {
+                                    areaspline: {
+                                        fillOpacity: 0.5
+                                    }
+                                },
+                                series: [{
+                                    showInLegend: false,
+                                    data: memory_usage,
+                                    marker: {
+                                        enabled: false
+                                    }
+                                }]
+                            });
+
+                            var cpu_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                cpu_usage.push(response.data.memory[i]["Cpu"]);
+                            }
+
+                            Highcharts.chart('cpu_graph', {
+                                chart: {
+                                    type: 'areaspline'
+                                },
+                                title: {text: ''},
+                                exporting: {enabled: false},
+                                credits: {enabled: false},
+                                xAxis: {
+                                    visible: false
+                                },
+                                yAxis: {
+                                    visible: false
+                                },
+                                plotOptions: {
+                                    areaspline: {
+                                        fillOpacity: 0.5
+                                    }
+                                },
+                                series: [{
+                                    showInLegend: false,
+                                    data: cpu_usage,
+                                    marker: {
+                                        enabled: false
+                                    }
+                                }]
+                            });
+
+                            var network_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                network_usage.push(response.data.memory[i]["Network"]);
+                            }
+
+                            Highcharts.chart('network_graph', {
+                                chart: {
+                                    type: 'areaspline'
+                                },
+                                title: {text: ''},
+                                exporting: {enabled: false},
+                                credits: {enabled: false},
+                                xAxis: {
+                                    visible: false
+                                },
+                                yAxis: {
+                                    visible: false
+                                },
+                                plotOptions: {
+                                    areaspline: {
+                                        fillOpacity: 0.5
+                                    }
+                                },
+                                series: [{
+                                    showInLegend: false,
+                                    data: network_usage,
+                                    marker: {
+                                        enabled: false
+                                    }
+                                }],
+                                line: {
+                                    marker: {
+                                        enabled: false
+                                    }
+                                }
+                            });
+
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+
+            get_current_servers();
+            get_memory_usage();
+
+        }]);
+    </script>
+{% endblock %}

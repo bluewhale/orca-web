@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <div class="topnavtitle">Server Map</div>
+{% endblock %}
+{% block body %}
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <div ng-app="ApplicationsDashboard">
+        <div ng-controller="Main as main">
+            <script>
+                window.toggle_main_nav("leftnav_servermap");
+            </script>
+
+            <br>
+            {% raw %}
+            <ul class="list-group">
+                <li class="list-group-item" ng-repeat="server in main.servers">
+
+                    <span class="badge" ng-bind="application.Name" ng-repeat="application in server.Apps"></span>
+                    <a href="/server/{{ server.Id }}/overview" ng-bind="server.Id"></a>
+                </li>
+            </ul>
+            {% endraw %}
+            <script>
+                angular.module("ApplicationsDashboard", []).controller("Main", ["$http", function ($http) {
+                    var self = this;
+                    self.servers = [];
+
+                    var get_servers = function(){
+                        return $http.get("/ajax/servers").then(
+                                function(response){
+                                    self.servers = response.data["servers"]
+                                }, function(err){
+                                    console.log("err")
+                                }
+                        )
+                    };
+                    get_servers();
+                }]);
+            </script>
+        </div>
+    </div>
+{% endblock %}

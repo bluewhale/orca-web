@@ -1,59 +1,84 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-<div class="topnavtitle">Orca Applications</div>
-{%endblock%}
+    <div class="topnavtitle">Applications</div>
+{% endblock %}
 {% block body %}
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <div ng-app="ApplicationsDashboard">
+        <div ng-controller="Main as main">
+            <script>
+                window.toggle_main_nav("leftnav_applications");
+                window.open_add_application = function () {
+                    $("#addappmodal").modal("show");
+                };
+            </script>
 
-<script>
-    window.create_new_application = function () {
-        jQuery.post("/application", {
-            "name": $("#name").val()
-        });
-        window.location = "";
-    };
+            <div id="addappmodal" class="modal fade" tabindex="-1" role="dialog">
+                <form name="add" ng-submit="main.add_application()">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Create New Application</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label>Application Name</label>
+                                    <input type="text" class="form-control" ng-model="main.newApplication.Name">
+                                </div>
 
-    window.open_add_application = function(){
-        $("#addappmodal").modal("show");
-    };
-</script>
-
-<div id="addappmodal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                        aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Create New Application</h4>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Application Name</label>
-                    <input type="text" class="form-control" value="" name="filename" id="name">
-                </div>
 
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="window.create_new_application();">Save</button>
-            </div>
+            <br>
+            {% raw %}
+            <ul class="list-group">
+                <li class="list-group-item" ng-repeat="application in main.applications">
+                    <span class="badge" ng-bind="application.Version"></span>
+                    <a href="/application/{{ application.Name }}/overview" ng-bind="application.Name"></a>
+                </li>
+                <li class="list-group-item">
+                    <a onclick="window.open_add_application();">Add Application</a>
+                </li>
+            </ul>
+            {% endraw %}
+            <script>
+                angular.module("ApplicationsDashboard", []).controller("Main", ["$http", function ($http) {
+                    var self = this;
+                    self.newApplication = {};
+                    self.applications = [];
+
+                    var get_applications = function(){
+                        return $http.get("/applications").then(
+                                function(response){
+                                    self.applications = response.data["applications"]
+                                }, function(err){
+                                    console.log("err")
+                                }
+                        )
+                    };
+                    get_applications();
+
+                    console.log(self.applications);
+                    self.add_application = function(){
+                        $http.post("/application", self.newApplication).then(function(response){
+                            self.newApplication = {};
+                            get_applications();
+                            $("#addappmodal").modal("hide");
+                        });
+                    }
+                }]);
+            </script>
         </div>
     </div>
-</div>
-
-<br>
-<ul class="list-group">
-    {% for app_name, application in configuration.iteritems() %}
-
-    <li class="list-group-item">
-        <span class="badge">{{application.Version}}</span>
-        <span class="badge">{{application.Type}}</span>
-        <a href="/application/{{application.Name}}">{{application.Name}}</a>
-    </li>
-    {% endfor %}
-
-    <li class="list-group-item">
-        <a onclick="window.open_add_application();">Add Application</a>
-    </li>
-</ul>
-
 {% endblock %}

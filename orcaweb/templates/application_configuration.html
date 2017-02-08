@@ -1,0 +1,330 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <div>
+        <div class="topnavtitle">
+            Managing Application {{ name }}
+        </div>
+    </div>
+{% endblock %}
+{% block body %}
+    <script>
+        window.toggle_main_nav("leftnav_applications");
+    </script>
+    <br>
+    <style>
+        .minor-navitem {
+            display: inline-table;
+            padding-right: 10px;
+            font-size: 15px;
+            color: gray;
+        }
+
+        .selected {
+            font-weight: 500;
+        }
+
+        .minor-navbar {
+            padding-bottom: 10px;
+            border-bottom: solid 1px whitesmoke;;
+        }
+    </style>
+
+    <div class="row">
+        <div class="minor-navbar">
+            {% include "application_navbar.html" %}
+            <script>
+                $("#configuration-nav").addClass("selected")
+            </script>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <div ng-app="ApplicationSettings" class="row">
+        <div ng-controller="Main as main">
+            <form ng-submit="main.save()">
+                <div class="row configuration_row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Needs</div>
+                        <div class="subtext">
+                            Configure estimated application requirements for a single node. This helps us decide how
+                            this application
+                            can be sharded.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+
+                        <div class="form-group">
+                            <label>MemoryNeeds</label>
+                            <input type="number" class="form-control" ng-model="main.application.Needs.MemoryNeeds">
+                        </div>
+                        <div class="form-group">
+                            <label>CpuNeeds</label>
+                            <input type="number" class="form-control" ng-model="main.application.Needs.CpuNeeds">
+                        </div>
+                        <div class="form-group">
+                            <label>NetworkNeeds</label>
+                            <input type="number" class="form-control" ng-model="main.application.Needs.NetworkNeeds">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row configuration_row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Docker Configuration</div>
+                        <div class="subtext">
+                            Configure the docker container, repository, version and other details.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+
+                        <div class="form-group">
+                            <label>Docker Repository</label>
+                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Repository">
+                        </div>
+                        <div class="form-group">
+                            <label>Docker Tag</label>
+                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Tag">
+                        </div>
+                        <div class="form-group">
+                            <label>Docker Reference</label>
+                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Reference">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="configuration_row row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Network Configuration</div>
+                        <div class="subtext">
+                            Configure Network VPC and the loadbalancer.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>Load Balancer</label>
+                            <div class="form-group form-inline" ng-repeat="mapping in main.application.LoadBalancer">
+                                <input type="text" class="form-control" ng-model="mapping.Domain" placeholder="LB">
+                                <a ng-click="main.delete_loadbalancer(mapping.Domain)"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
+                            </div>
+                            <a ng-click="main.create_loadbalancer()">Add Lb</a>
+                            </div>
+                        <div class="form-group">
+                            <label>VPC/Network</label>
+                            <input type="text" class="form-control" ng-model="main.application.Network">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="configuration_row row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Port Mappings</div>
+                        <div class="subtext">
+                            Configure exposed ports for your docker application. Ports exposed here will be available
+                            for your loadbalancer.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group form-inline" ng-repeat="mapping in main.application.PortMappings">
+                            <input type="text" class="form-control" ng-model="mapping.HostPort" placeholder="Host Port">
+                            <input type="text" class="form-control" ng-model="mapping.ContainerPort"
+                                   placeholder="Container Port">
+                            <a ng-click="main.delete_port_mapping(mapping.HostPort, mapping.ContainerPort)"><i
+                                    class="glyphicon glyphicon-remove"></i></a>
+                        </div>
+                        <a ng-click="main.create_port_mapping()">Add Mapping</a>
+                    </div>
+                </div>
+
+                <div class="configuration_row row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Volumes</div>
+                        <div class="subtext">
+                            Configure docker volumes that will be pushed to the docker container and available inside
+                            your container.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group form-inline" ng-repeat="mapping in main.application.VolumeMappings">
+                            <input size="40" type="text" class="form-control" ng-model="mapping.HostPath"
+                                   placeholder="Source"/>
+                            <input size="40" type="text" class="form-control" ng-model="mapping.ContainerPath"
+                                   placeholder="Destination"/>
+                            <a ng-click="main.delete_volume(mapping.HostPath)"><i
+                                    class="glyphicon glyphicon-remove"></i></a>
+                        </div>
+                        <a ng-click="main.create_volume()">Add Volume</a>
+                    </div>
+                </div>
+                <div class="configuration_row row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Environment Variables</div>
+                        <div class="subtext">
+                            Configure environment variables that will be pushed to the docker container and available
+                            inside your container.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group form-inline"
+                             ng-repeat="mapping in main.application.EnvironmentVariables">
+                            <input size="30" type="text" class="form-control" ng-model="mapping.Key">
+                            <input size="50" type="text" class="form-control" ng-model="mapping.Value">
+                            <a ng-click="main.delete_env_variable(mapping.Key)"><i
+                                    class="glyphicon glyphicon-remove"></i></a>
+                        </div>
+                        <a ng-click="main.create_environment()">Add Variable</a>
+                    </div>
+                </div>
+
+                <div class="configuration_row row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Files</div>
+                        <div class="subtext">
+                            Configure files that will be uploaded to the host.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group" ng-repeat="mapping in main.application.Files">
+                            <div>
+                                <input style="margin-bottom: 5px;;" type="text" class="form-control"
+                                       ng-model="mapping.HostPath">
+                                <textarea class="form-control" ng-model="mapping.Base64FileContents"></textarea>
+                                <a ng-click="main.delete_file(mapping.HostPath)">Remove File</a>
+                            </div>
+                            <hr>
+                        </div>
+                        <a ng-click="main.create_file()">Add File</a>
+                    </div>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-default">Save Settings</button>
+                <br><br>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        angular.module("ApplicationSettings", []).controller("Main", ["$http", function ($http) {
+            var self = this;
+            self.application = {};
+
+            var get_application = function () {
+                return $http.get("/ajax/application/{{ name }}/configuration").then(
+                        function (response) {
+                            self.application = response.data
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+            get_application();
+            self.save = function () {
+                $http.post("/ajax/application/{{ name }}/configuration", self.application).then(function (response) {
+                    get_application();
+                });
+            };
+
+            self.create_port_mapping = function () {
+                if (!self.application.PortMappings) {
+                    self.application.PortMappings = []
+                }
+                self.application.PortMappings.push({
+                    "HostPort": "",
+                    "ContainerPort": ""
+                })
+            };
+
+            self.delete_port_mapping = function (HostPort, ContainerPort) {
+                var new_items = [];
+                for (var i = 0; i < self.application.PortMappings.length; i++) {
+                    if (!(self.application.PortMappings[i].HostPort == HostPort && self.application.PortMappings[i].ContainerPort == ContainerPort)) {
+                        new_items.push(self.application.PortMappings[i]);
+                    }
+                }
+
+                self.application.PortMappings = new_items;
+            };
+
+            self.delete_env_variable = function (Key) {
+                var new_items = [];
+                for (var i = 0; i < self.application.EnvironmentVariables.length; i++) {
+                    if (!(self.application.EnvironmentVariables[i].Key == Key)) {
+                        new_items.push(self.application.EnvironmentVariables[i]);
+                    }
+                }
+
+                self.application.EnvironmentVariables = new_items;
+            };
+
+            self.create_environment = function () {
+                if (!self.application.EnvironmentVariables) {
+                    self.application.EnvironmentVariables = []
+                }
+                self.application.EnvironmentVariables.push({
+                    "Key": "",
+                    "Value": ""
+                })
+            };
+
+            self.create_file = function () {
+                if (!self.application.Files) {
+                    self.application.Files = []
+                }
+                self.application.Files.push({
+                    "HostPath": "",
+                    "Base64FileContents": ""
+                })
+            };
+            self.delete_file = function (File) {
+                var new_items = [];
+                for (var i = 0; i < self.application.Files.length; i++) {
+                    if (!(self.application.Files[i].HostPath == File)) {
+                        new_items.push(self.application.Files[i]);
+                    }
+                }
+
+                self.application.Files = new_items;
+            };
+
+            self.create_volume = function () {
+                if (!self.application.VolumeMappings) {
+                    self.application.VolumeMappings = []
+                }
+                self.application.VolumeMappings.push({
+                    "HostPath": "",
+                    "ContainerPath": ""
+                })
+            };
+            self.delete_volume = function (HostPath) {
+                var new_items = [];
+                for (var i = 0; i < self.application.VolumeMappings.length; i++) {
+                    if (!(self.application.VolumeMappings[i].HostPath == HostPath)) {
+                        new_items.push(self.application.VolumeMappings[i]);
+                    }
+                }
+
+                self.application.VolumeMappings = new_items;
+            };
+
+            self.create_loadbalancer = function () {
+                if (!self.application.LoadBalancer) {
+                    self.application.LoadBalancer = []
+                }
+                self.application.LoadBalancer.push({
+                    "Domain": ""
+                })
+            };
+            self.delete_loadbalancer = function (lb) {
+                var new_items = [];
+                for (var i = 0; i < self.application.LoadBalancer.length; i++) {
+                    if (!(self.application.LoadBalancer[i]["Domain"] == lb)) {
+                        new_items.push(self.application.LoadBalancer[i]);
+                    }
+                }
+
+                self.application.LoadBalancer = new_items;
+            };
+        }]);
+
+    </script>
+{% endblock %}
