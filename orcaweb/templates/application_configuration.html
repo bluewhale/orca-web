@@ -88,6 +88,23 @@
                             <label>Docker Reference</label>
                             <input type="text" class="form-control" ng-model="main.application.DockerConfig.Reference">
                         </div>
+
+                        <div class="form-group">
+                            <label>Docker Username</label>
+                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Username">
+                        </div>
+                        <div class="form-group">
+                            <label>Docker Email</label>
+                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Email">
+                        </div>
+                        <div class="form-group">
+                            <label>Docker Password</label>
+                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Password">
+                        </div>
+                        <div class="form-group">
+                            <label>Docker Server</label>
+                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Server">
+                        </div>
                     </div>
                 </div>
 
@@ -107,7 +124,17 @@
                                         class="glyphicon glyphicon-remove"></i></a>
                             </div>
                             <a ng-click="main.create_loadbalancer()">Add Lb</a>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Security Group</label>
+                            <div class="form-group form-inline" ng-repeat="mapping in main.application.SecurityGroups">
+                                <input type="text" class="form-control" ng-model="mapping.Group" placeholder="SGroup">
+                                <a ng-click="main.delete_securitygroup(mapping.Group)"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
                             </div>
+                            <a ng-click="main.create_securitygroup()">Add Security Group</a>
+                        </div>
                         <div class="form-group">
                             <label>VPC/Network</label>
                             <input type="text" class="form-control" ng-model="main.application.Network">
@@ -323,6 +350,25 @@
                 }
 
                 self.application.LoadBalancer = new_items;
+            };
+
+            self.create_securitygroup = function () {
+                if (!self.application.SecurityGroups) {
+                    self.application.SecurityGroups = []
+                }
+                self.application.SecurityGroups.push({
+                    "Group": ""
+                })
+            };
+            self.delete_securitygroup = function (lb) {
+                var new_items = [];
+                for (var i = 0; i < self.application.SecurityGroups.length; i++) {
+                    if (!(self.application.SecurityGroups[i]["Group"] == lb)) {
+                        new_items.push(self.application.SecurityGroups[i]);
+                    }
+                }
+
+                self.application.SecurityGroups = new_items;
             };
         }]);
 
