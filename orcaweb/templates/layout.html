@@ -5,7 +5,10 @@
 <link rel="stylesheet" href="/static/style/bootstrap.min.css">
 <script src="/static/libs/bootstrap.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 </head>
 
 <body>
@@ -121,6 +124,32 @@
         margin-left: 10px;
         margin-right: 10px;
     }
+
+    .navitem span {
+        padding-left: 6px;
+        text-decoration: none;
+    }
+
+    .navitem a:hover {
+        text-decoration: none;
+    }
+
+    .navitem:hover {
+        background: #5C4E90 !important;
+    }
+
+    .topnavtitle {
+        display:inline;
+    }
+
+    #top{
+        padding-right:10px;
+        padding-top:10px;
+    }
+
+    #connectedto {
+        padding-right:50px;
+    }
 </style>
 
 <script>
@@ -136,20 +165,25 @@
             <b>ORCA</b> gastrator
         </div>
         <div id="leftnav">
-            <div class="navitem selected" id="leftnav_applications"><a href="/"><i class="glyphicon glyphicon-th"></i>
-                applications</a></div>
-            <div class="navitem selected" id="leftnav_servermap"><a href="/servers"><i class="glyphicon glyphicon-th"></i>
-                servers</a></div>
-            <div class="navitem selected" id="leftnav_audit"><a href="/audit"><i
-                    class="glyphicon glyphicon-exclamation-sign"></i> audit trail</a></div>
-            <div class="navitem" id="leftnav_settings"><a href="/settings"><i class="glyphicon glyphicon-cog"></i>
-                settings</a></div>
+            <div class="navitem selected" id="leftnav_applications"><a href="/"><i class="fa-fw fa fa-cubes"></i>
+                <span>Applications</span></a></div>
+            <div class="navitem selected" id="leftnav_servermap"><a href="/servers"><i class="fa-fw fa fa-server"></i>
+                <span>Servers</span></a></div>
+            <div class="navitem selected" id="leftnav_audit"><a href="/audit">
+                <i class="fa-fw fa fa-bell-o"></i> <span> Audit trail </span></a></div>
+            <div class="navitem" id="leftnav_settings"><a href="/settings"><i class="fa-fw fa fa-cog"></i>
+                <span> Settings</span></a></div>
         </div>
 
     </div>
     <div id="mainsection">
         <div id="top">
-            {% block navigation_top %}{% endblock %}
+            <div>
+                {% block navigation_top %}{% endblock %}
+                <div class="connectedto pull-right">
+                    <span>Connected to {{ g.server }} as {{ g.username }}</span>
+                </div>
+            </div>
         </div>
         <div id="mainblock">
             <div class="container-fluid">

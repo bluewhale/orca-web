@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-    <span class="topnavtitle">Managing Application {{ name }}</span>
+    <span class="topnavtitle">Managing Server {{ name }}</span>
 {% endblock %}
 {% block body %}
     <script>
-        window.toggle_main_nav("leftnav_applications");
+                window.toggle_main_nav("leftnav_servermap");
     </script>
     <br>
     <style>
@@ -45,7 +45,7 @@
     </style>
     <div class="row">
         <div class="minor-navbar">
-            {% include "application_navbar.html" %}
+            {% include "server_navbar.html" %}
             <script>
                 $("#events-nav").addClass("selected")
             </script>
@@ -53,7 +53,7 @@
         </div>
     </div>
 
-    <div ng-app="ApplicationSettings">
+    <div ng-app="ServerSettings">
         <div ng-controller="Main as main">
             <div class="configuration_row row">
                 <div class="col-md-12">
@@ -69,12 +69,12 @@
     </div>
 
     <script>
-        angular.module("ApplicationSettings", []).controller("Main", ["$http", function ($http) {
+        angular.module("ServerSettings", []).controller("Main", ["$http", function ($http) {
             var self = this;
             self.servers = [];
 
             var get_events = function () {
-                return $http.get("/ajax/application/{{ name }}/events").then(
+                return $http.get("/ajax/server/{{ name }}/events").then(
                         function (response) {
                             self.events = response.data.events;
                         }, function (err) {

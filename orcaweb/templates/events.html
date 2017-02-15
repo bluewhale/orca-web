@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <div class="topnavtitle">Audit Trail</div>
+{% endblock %}
+{% block body %}
+    <script>
+        window.toggle_main_nav("leftnav_audit");
+    </script>
+    <br>
+
+    <div ng-app="Audit">
+        <div ng-controller="Main as main">
+            <div class="configuration_row row">
+                <div class="col-md-12">
+
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="event in main.events">
+                            <span ng-bind="event.Timestamp"></span> - <span ng-bind="event.Severity"></span> - <span ng-bind="event.Message"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        angular.module("Audit", []).controller("Main", ["$http", function ($http) {
+            var self = this;
+            self.servers = [];
+
+            var get_events = function () {
+                return $http.get("/ajax/events").then(
+                        function (response) {
+                            self.events = response.data.events;
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+
+            get_events();
+        }]);
+    </script>
+{% endblock %}

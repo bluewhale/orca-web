@@ -5,41 +5,81 @@ import flask
 from flask import render_template
 from flask import request
 from flask import redirect
+from flask.ext.login import login_required
 
 from orcaweb import app
 from orcaweb.services import api__trainer
 
 
 @app.route("/")
+@login_required
 def route_dashboard():
     return render_template("dashboard.html", configuration=api__trainer.get__configuration__applications())
 
 
 @app.route("/servers")
+@login_required
 def route_servers():
     return render_template("servers.html")
 
 
 @app.route("/applications")
+@login_required
 def route_applications_get():
     return flask.jsonify(applications=api__trainer.get__configuration__applications())
 
+@app.route("/ajax/applications/by/vpc")
+@login_required
+def route_applications_get__by_vpc():
+    ret = {}
+    servers = api__trainer.get__status__servers()
+    applications = api__trainer.get__configuration__applications()
+    for app in applications:
+        app["Running"] = 0
+        app["Failed"] = 0
+
+        configurations = list(app.get("Config", []).values())
+        if configurations:
+            appConfiguration = configurations[-1]
+            if appConfiguration["Network"] not in ret:
+                ret[appConfiguration["Network"]] = []
+
+            for key, server in servers.iteritems():
+                if server.get("Apps"):
+                    for serverAppState in server.get("Apps", []):
+                        if serverAppState["Name"] == app["Name"]:
+                            if serverAppState["State"] == "running":
+                                app["Running"] += 1
+                            else:
+                                app["Failed"] += 1
+            ret[appConfiguration["Network"]].append(app)
+        else:
+            if "unknown" not in ret:
+                ret["unknown"] = []
+            ret["unknown"].append(app)
+    return flask.jsonify(applications=ret)
+
 
 @app.route("/audit")
+@login_required
 def route_audit():
-    return render_template("audit.html", audit=api__trainer.get__audit())
+    return render_template("events.html")
 
 
 @app.route("/settings")
+@login_required
 def route_settings():
     return render_template("settings.html", cloud=api__trainer.get__configuration__cloud())
 
 
 @app.route("/ajax/settings", methods=["GET"])
+@login_required
 def ajax__route_settings():
     return flask.jsonify(api__trainer.get__configuration__cloud())
 
+
 @app.route("/ajax/servers", methods=["GET"])
+@login_required
 def ajax__route_servers():
     servers = api__trainer.get__status__servers()
     ret = []
@@ -49,32 +89,58 @@ def ajax__route_servers():
 
 
 @app.route("/ajax/settings", methods=["POST"])
+@login_required
 def ajax__route_settings_post():
     api__trainer.set__configuration__cloud(request.json)
     return ""
 
+
 @app.route("/ajax/application/<name>", methods=["GET"])
+@login_required
 def ajax__route_application(name):
     return flask.jsonify(api__trainer.get__configuration__applications_app(name))
 
+
 @app.route("/ajax/application/<name>/configuration", methods=["GET"])
+@login_required
 def ajax__route_application_configuration(name):
     return flask.jsonify(api__trainer.get__configuration__applications_app__config(name))
 
 
+@app.route("/ajax/server/<name>/logs", methods=["GET"])
+@login_required
+def ajax__route_server_logs(name):
+    return flask.jsonify(logs=api__trainer.get__status__server_logs(name))
+
+
+@app.route("/ajax/server/<name>", methods=["GET"])
+@login_required
+def ajax__route_server(name):
+    return flask.jsonify(server=api__trainer.get__status__server(name))
+
+
+@app.route("/ajax/server/<name>/audit", methods=["GET"])
+@login_required
+def ajax__route_server_audit(name):
+    return flask.jsonify(api__trainer.get__status__server_audit(name))
+
+
 @app.route("/ajax/application/<name>", methods=["POST"])
+@login_required
 def ajax__route_application_post(name):
     api__trainer.set__configuration__applications_app(name, request.json)
     return ""
 
 
 @app.route("/ajax/application/<name>/configuration", methods=["POST"])
+@login_required
 def ajax__route_application_post_configuration(name):
     api__trainer.set__configuration__applications_app__config(name, request.json)
     return ""
 
 
 @app.route("/settings", methods=["POST"])
+@login_required
 def route_settings_save():
     cloud_provider_configuration = {
         "Type": request.form.get("Type"),
@@ -96,30 +162,49 @@ def route_settings_save():
 
 
 @app.route("/application/<name>/scaling", methods=["GET"])
+@login_required
 def route_application_scaling(name):
     return render_template("application_settings.html", name=name)
 
+
 @app.route("/application/<name>/configuration", methods=["GET"])
+@login_required
 def route_application_configuration(name):
     return render_template("application_configuration.html", name=name)
 
 
 @app.route("/application/<name>/events", methods=["GET"])
+@login_required
 def route_application_events(name):
     return render_template("application_events.html", name=name)
 
 
+@app.route("/application/<name>/logs", methods=["GET"])
+@login_required
+def route_application_logs(name):
+    return render_template("application_logs.html", name=name)
+
+
+@app.route("/ajax/events", methods=["GET"])
+@login_required
+def route_events():
+    return flask.jsonify(events=api__trainer.get__audit())
+
+
 @app.route("/application/<name>/server/<serverid>", methods=["GET"])
+@login_required
 def route_application_server(name, serverid):
     return render_template("application_server.html", name=name, serverid=serverid)
 
 
 @app.route("/application/<name>/overview", methods=["GET"])
+@login_required
 def route_application_overview(name):
     return render_template("application_overview.html", name=name)
 
 
 @app.route("/ajax/application/<name>/servers", methods=["GET"])
+@login_required
 def ajax__route_application_servers(name):
     servers = []
     cloud_layout = api__trainer.get__configuration__cloud_state()
@@ -131,6 +216,7 @@ def ajax__route_application_servers(name):
 
 
 @app.route("/ajax/application/<name>/servers/desired", methods=["GET"])
+@login_required
 def ajax__route_application_servers_desired(name):
     servers = []
     cloud_layout = api__trainer.get__configuration__cloud_state()
@@ -142,18 +228,39 @@ def ajax__route_application_servers_desired(name):
 
 
 @app.route("/ajax/application/<name>/servers/memory", methods=["GET"])
+@login_required
 def ajax__route_application_servers_memory(name):
     return flask.jsonify(memory=api__trainer.get__status__application_statistics(name))
 
 
 @app.route("/ajax/application/<name>/count", methods=["GET"])
+@login_required
 def ajax__route_application_count(name):
     return flask.jsonify(count=api__trainer.get__status__application_count(name))
 
 
 @app.route("/ajax/application/<name>/events", methods=["GET"])
+@login_required
 def ajax__route_application_events(name):
     return flask.jsonify(events=api__trainer.get__status__application_events(name))
+
+
+@app.route("/ajax/server/<name>/events", methods=["GET"])
+@login_required
+def ajax__route_server_events(name):
+    return flask.jsonify(events=api__trainer.get__status__server_audit(name))
+
+@app.route("/ajax/server/<name>/memory", methods=["GET"])
+@login_required
+def ajax__route_server_memory(name):
+    return flask.jsonify(memory=api__trainer.get__status__server_memory(name))
+
+
+@app.route("/ajax/application/<name>/logs", methods=["GET"])
+@login_required
+def ajax__route_application_logs(name):
+    return flask.jsonify(logs=api__trainer.get__status__application_logs(name))
+
 
 def extract_command(string_command):
     p = re.compile('([a-z]+)\s(.*)')
@@ -162,13 +269,33 @@ def extract_command(string_command):
 
 
 @app.route("/application", methods=["POST"])
+@login_required
 def route_application__add():
     application = request.json
     api__trainer.set__configuration__applications_app(application["Name"], application)
     return ""
 
 
+@app.route("/server/<name>/overview")
+@login_required
+def route_server(name):
+    return render_template("server_overview.html", name=name)
+
+
+@app.route("/server/<name>/logs")
+@login_required
+def route_server_logs(name):
+    return render_template("server_logs.html", name=name)
+
+
+@app.route("/server/<name>/events")
+@login_required
+def route_server_events(name):
+    return render_template("server_events.html", name=name)
+
+
 @app.route("/application/<name>", methods=["POST"])
+@login_required
 def route_application__set(name):
     existing_configuration = api__trainer.get__configuration__applications_app(name)
     existing_configuration["Type"] = request.form.get("Type")
@@ -192,6 +319,7 @@ def route_application__set(name):
 
 
 @app.route("/application/<name>/configuration", methods=["POST"])
+@login_required
 def route_application__set_configuration(name):
     existing_configuration = api__trainer.get__configuration__applications_app__config(name)
     existing_configuration["DockerConfig"]["Tag"] = request.form.get("Tag")

@@ -47,7 +47,7 @@
         <div class="minor-navbar">
             {% include "application_navbar.html" %}
             <script>
-                $("#events-nav").addClass("selected")
+                $("#logs-nav").addClass("selected")
             </script>
 
         </div>
@@ -59,8 +59,8 @@
                 <div class="col-md-12">
 
                     <ul class="list-group">
-                        <li class="list-group-item" ng-repeat="event in main.events">
-                            <span ng-bind="event.Timestamp"></span> - <span ng-bind="event.Severity"></span> - <span ng-bind="event.Message"></span>
+                        <li class="list-group-item" ng-repeat="log in main.logs">
+                           <span ng-bind="log.Timestamp"></span> - <span ng-bind="log.HostId"></span> - <span ng-bind="log.Message"></span>
                         </li>
                     </ul>
                 </div>
@@ -74,9 +74,9 @@
             self.servers = [];
 
             var get_events = function () {
-                return $http.get("/ajax/application/{{ name }}/events").then(
+                return $http.get("/ajax/application/{{ name }}/logs").then(
                         function (response) {
-                            self.events = response.data.events;
+                            self.logs = response.data.logs;
                         }, function (err) {
                             console.log("err")
                         }

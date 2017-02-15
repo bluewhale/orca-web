@@ -11,15 +11,28 @@
             </script>
 
             <br>
-            {% raw %}
-            <ul class="list-group">
-                <li class="list-group-item" ng-repeat="server in main.servers">
+            <table class="table table-bordered">
+                <thead>
+                <th>HostID</th>
+                <th>State</th>
+                <th>Spot Instance</th>
+                <th>Applications</th>
+                </thead>
 
-                    <span class="badge" ng-bind="application.Name" ng-repeat="application in server.Apps"></span>
-                    <a href="/server/{{ server.Id }}/overview" ng-bind="server.Id"></a>
-                </li>
-            </ul>
-            {% endraw %}
+                <tbody>
+                {% raw %}
+                    <tr ng-repeat="server in main.servers">
+                        <td><a href="/server/{{ server.Id }}/overview" ng-bind="server.Id"></a></td>
+                        <td><span ng-bind="server.State"></span></td>
+                        <td><span ng-bind="server.SpotInstance"></span></td>
+                        <td>
+                            <span class="badge" ng-bind="application.Name" ng-repeat="application in server.Apps"></span>
+                        </td>
+                    </tr>
+                {% endraw %}
+                </tbody>
+            </table>
+
             <script>
                 angular.module("ApplicationsDashboard", []).controller("Main", ["$http", function ($http) {
                     var self = this;

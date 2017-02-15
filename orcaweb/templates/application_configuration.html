@@ -1,10 +1,6 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-    <div>
-        <div class="topnavtitle">
-            Managing Application {{ name }}
-        </div>
-    </div>
+    <span class="topnavtitle">Managing Application {{ name }}</span>
 {% endblock %}
 {% block body %}
     <script>
@@ -43,29 +39,25 @@
             <form ng-submit="main.save()">
                 <div class="row configuration_row">
                     <div class="col-lg-4">
-                        <div class="subtitle">Needs</div>
+                        <div class="subtitle">Affinity Tags</div>
                         <div class="subtext">
-                            Configure estimated application requirements for a single node. This helps us decide how
-                            this application
-                            can be sharded.
+                            Affinity tags provide a mechanism for grouping applications together on hosts.
                         </div>
                     </div>
                     <div class="col-lg-8">
 
                         <div class="form-group">
-                            <label>MemoryNeeds</label>
-                            <input type="number" class="form-control" ng-model="main.application.Needs.MemoryNeeds">
-                        </div>
-                        <div class="form-group">
-                            <label>CpuNeeds</label>
-                            <input type="number" class="form-control" ng-model="main.application.Needs.CpuNeeds">
-                        </div>
-                        <div class="form-group">
-                            <label>NetworkNeeds</label>
-                            <input type="number" class="form-control" ng-model="main.application.Needs.NetworkNeeds">
+                            <label>Tags</label>
+                            <div class="form-group form-inline" ng-repeat="mapping in main.application.Affinity">
+                                <input type="text" class="form-control" ng-model="mapping.Tag" placeholder="Affinity">
+                                <a ng-click="main.delete_affinitytag(mapping.Tag)"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
+                            </div>
+                            <a ng-click="main.create_affinitytag()">Add Tag</a>
                         </div>
                     </div>
                 </div>
+
 
                 <div class="row configuration_row">
                     <div class="col-lg-4">
@@ -142,6 +134,31 @@
                     </div>
                 </div>
 
+                <div class="configuration_row row">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Application Health Checks</div>
+                        <div class="subtext">
+                            Configure application checks if needed.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>Load Balancer</label>
+                            <div class="form-group form-inline" ng-repeat="mapping in main.application.Checks">
+                                <select ng-model="mapping.Type">
+                                    <option value="http">http</option>
+                                    <option value="tcp">tcp</option>
+                                </select>
+
+                                <input type="text" class="form-control" ng-model="mapping.Goal"
+                                       placeholder="Port or Path">
+                                <a ng-click="main.delete_healthcheck(mapping.Goal)"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
+                            </div>
+                            <a ng-click="main.create_healthcheck()">Add Check</a>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="configuration_row row">
                     <div class="col-lg-4">
@@ -369,6 +386,45 @@
                 }
 
                 self.application.SecurityGroups = new_items;
+            };
+
+            self.create_healthcheck = function () {
+                if (!self.application.Checks) {
+                    self.application.Checks = []
+                }
+                self.application.Checks.push({
+                    "Goal": "",
+                    "Type": "http"
+                })
+            };
+            self.delete_healthcheck = function (uri, port) {
+                var new_items = [];
+                for (var i = 0; i < self.application.Checks.length; i++) {
+                    if (!(self.application.Checks[i]["Goal"] == uri)) {
+                        new_items.push(self.application.Checks[i]);
+                    }
+                }
+
+                self.application.Checks = new_items;
+            };
+
+            self.create_affinitytag = function () {
+                if (!self.application.Affinity) {
+                    self.application.Affinity = []
+                }
+                self.application.Affinity.push({
+                    "Tag": ""
+                })
+            };
+            self.delete_affinitytag = function (tag) {
+                var new_items = [];
+                for (var i = 0; i < self.application.Affinity.length; i++) {
+                    if (!(self.application.Affinity[i]["Tag"] == tag)) {
+                        new_items.push(self.application.Affinity[i]);
+                    }
+                }
+
+                self.application.Affinity = new_items;
             };
         }]);
 

@@ -1,0 +1,357 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <span class="topnavtitle">Managing Server {{ name }}</span>
+{% endblock %}
+{% block body %}
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+    <script>
+        window.toggle_main_nav("leftnav_servermap");
+    </script>
+    <br>
+    <style>
+        .minor-navitem {
+            display: inline-table;
+            padding-right: 10px;
+            font-size: 15px;
+            color: gray;
+        }
+
+        .selected {
+            font-weight: 500;
+        }
+
+        .minor-navbar {
+            padding-bottom: 10px;
+            border-bottom: solid 1px whitesmoke;;
+        }
+
+        .statpill {
+            border-radius: 3px;
+        }
+
+        .statpill-metric {
+            font-size: 30px;
+        }
+
+        .statpill-name {
+            text-transform: uppercase;
+        }
+
+        .statpill-root {
+            padding-left: 0px !important;
+        }
+
+        .border-right {
+        }
+    </style>
+    <div class="row">
+        <div class="minor-navbar">
+            {% include "server_navbar.html" %}
+            <script>
+                $("#overview-nav").addClass("selected")
+            </script>
+        </div>
+    </div>
+
+    <div ng-app="ServerOverview">
+        <div ng-controller="Main as main">
+            <div>
+                <div>FirstSeen: <span ng-bind="main.server.FirstSeen"></span></div>
+                <div>LastSeen: <span ng-bind="main.server.LastSeen"></span></div>
+                <div>Ip Address: <span ng-bind="main.server.Ip"></span></div>
+                <div>Network: <span ng-bind="main.server.Network"></span></div>
+                <div>SecurityGroups: <span ng-repeat="sgroup in main.server.SecurityGroups"><span
+                        ng-bind="sgroup.Group"></span></span></div>
+                <div>State: <span ng-bind="main.server.State"></span></div>
+                <div>SpotInstance: <span ng-bind="main.server.SpotInstance"></span></div>
+            </div>
+            <div><div id="cpu_graph"></div></div>
+            <div><div id="memory_graph"></div></div>
+            <div><div id="network_graph"></div></div>
+            <div><div id="hdd_graph"></div></div>
+
+            <div>
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="app in main.server.Apps">
+                        <span ng-bind="app.Name"></span>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="app in main.server.Changes">
+                        <span ng-bind="app.Type"></span>
+                        <span ng-bind="app.Time"></span>
+                        <span ng-bind="app.Name"></span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        angular.module("ServerOverview", []).controller("Main", ["$http", function ($http) {
+            var self = this;
+            var get_current_servers = function () {
+                return $http.get("/ajax/server/{{ name }}").then(
+                        function (response) {
+                            self.server = response.data.server;
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+
+            var get_memory_usage = function () {
+                return $http.get("/ajax/server/{{ name }}/memory").then(
+                        function (response) {
+                            var cpu_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                cpu_usage.push(response.data.memory[i]["Cpu"]);
+                            }
+
+                            var memory_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                memory_usage.push(response.data.memory[i]["Mbytes"]);
+                            }
+
+                            var network_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                network_usage.push(response.data.memory[i]["Network"]);
+                            }
+
+                            var hdd_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                hdd_usage.push(response.data.memory[i]["HardDiskUsagePercent"]);
+                            }
+
+                            Highcharts.chart('cpu_graph', {
+                                chart: {
+                                    type: 'areaspline'
+                                },
+                                title: {text: ''},
+                                exporting: {enabled: false},
+                                credits: {enabled: false},
+                                xAxis: {
+                                    visible: false
+                                },
+                                yAxis: {
+                                    visible: false
+                                },
+                                plotOptions: {
+                                    areaspline: {
+                                        fillOpacity: 0.5
+                                    }
+                                },
+                                series: [{
+                                    showInLegend: true,
+                                    data: cpu_usage,
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    name: "CPU Running"
+                                }]
+                            });
+
+                            Highcharts.chart('memory_graph', {
+                                chart: {
+                                    type: 'areaspline'
+                                },
+                                title: {text: ''},
+                                exporting: {enabled: false},
+                                credits: {enabled: false},
+                                xAxis: {
+                                    visible: false
+                                },
+                                yAxis: {
+                                    visible: false
+                                },
+                                plotOptions: {
+                                    areaspline: {
+                                        fillOpacity: 0.5
+                                    }
+                                },
+                                series: [{
+                                    showInLegend: true,
+                                    data: memory_usage,
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    name: "MEMORY Running"
+                                }]
+                            });
+
+                            Highcharts.chart('network_graph', {
+                                chart: {
+                                    type: 'areaspline'
+                                },
+                                title: {text: ''},
+                                exporting: {enabled: false},
+                                credits: {enabled: false},
+                                xAxis: {
+                                    visible: false
+                                },
+                                yAxis: {
+                                    visible: false
+                                },
+                                plotOptions: {
+                                    areaspline: {
+                                        fillOpacity: 0.5
+                                    }
+                                },
+                                series: [{
+                                    showInLegend: true,
+                                    data: network_usage,
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    name: "Network Running"
+                                }]
+                            });
+
+                            Highcharts.chart('hdd_graph', {
+                                chart: {
+                                    type: 'areaspline'
+                                },
+                                title: {text: ''},
+                                exporting: {enabled: false},
+                                credits: {enabled: false},
+                                xAxis: {
+                                    visible: false
+                                },
+                                yAxis: {
+                                    visible: false
+                                },
+                                plotOptions: {
+                                    areaspline: {
+                                        fillOpacity: 0.5
+                                    }
+                                },
+                                series: [{
+                                    showInLegend: true,
+                                    data: hdd_usage,
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    name: "HDD Percentage Running"
+                                }]
+                            });
+
+
+{#                            var memory_usage = [];#}
+{#                            for (var i = 0; i < response.data.memory.length; i++) {#}
+{#                                memory_usage.push(response.data.memory[i]["Mbytes"]);#}
+{#                            }#}
+{##}
+{#                            console.log(memory_usage);#}
+{#                            Highcharts.chart('memory_graph', {#}
+{#                                chart: {#}
+{#                                    type: 'areaspline'#}
+{#                                },#}
+{#                                title: {text: ''},#}
+{#                                exporting: {enabled: false},#}
+{#                                credits: {enabled: false},#}
+{#                                xAxis: {#}
+{#                                    visible: false#}
+{#                                },#}
+{#                                yAxis: {#}
+{#                                    visible: false#}
+{#                                },#}
+{#                                plotOptions: {#}
+{#                                    areaspline: {#}
+{#                                        fillOpacity: 0.5#}
+{#                                    }#}
+{#                                },#}
+{#                                series: [{#}
+{#                                    showInLegend: false,#}
+{#                                    data: memory_usage,#}
+{#                                    marker: {#}
+{#                                        enabled: false#}
+{#                                    }#}
+{#                                }]#}
+{#                            });#}
+{##}
+{#                            var cpu_usage = [];#}
+{#                            for (var i = 0; i < response.data.memory.length; i++) {#}
+{#                                cpu_usage.push(response.data.memory[i]["Cpu"]);#}
+{#                            }#}
+{##}
+{#                            Highcharts.chart('cpu_graph', {#}
+{#                                chart: {#}
+{#                                    type: 'areaspline'#}
+{#                                },#}
+{#                                title: {text: ''},#}
+{#                                exporting: {enabled: false},#}
+{#                                credits: {enabled: false},#}
+{#                                xAxis: {#}
+{#                                    visible: false#}
+{#                                },#}
+{#                                yAxis: {#}
+{#                                    visible: false#}
+{#                                },#}
+{#                                plotOptions: {#}
+{#                                    areaspline: {#}
+{#                                        fillOpacity: 0.5#}
+{#                                    }#}
+{#                                },#}
+{#                                series: [{#}
+{#                                    showInLegend: false,#}
+{#                                    data: cpu_usage,#}
+{#                                    marker: {#}
+{#                                        enabled: false#}
+{#                                    }#}
+{#                                }]#}
+{#                            });#}
+{##}
+{#                            var network_usage = [];#}
+{#                            for (var i = 0; i < response.data.memory.length; i++) {#}
+{#                                network_usage.push(response.data.memory[i]["Network"]);#}
+{#                            }#}
+{##}
+{#                            Highcharts.chart('network_graph', {#}
+{#                                chart: {#}
+{#                                    type: 'areaspline'#}
+{#                                },#}
+{#                                title: {text: ''},#}
+{#                                exporting: {enabled: false},#}
+{#                                credits: {enabled: false},#}
+{#                                xAxis: {#}
+{#                                    visible: false#}
+{#                                },#}
+{#                                yAxis: {#}
+{#                                    visible: false#}
+{#                                },#}
+{#                                plotOptions: {#}
+{#                                    areaspline: {#}
+{#                                        fillOpacity: 0.5#}
+{#                                    }#}
+{#                                },#}
+{#                                series: [{#}
+{#                                    showInLegend: false,#}
+{#                                    data: network_usage,#}
+{#                                    marker: {#}
+{#                                        enabled: false#}
+{#                                    }#}
+{#                                }],#}
+{#                                line: {#}
+{#                                    marker: {#}
+{#                                        enabled: false#}
+{#                                    }#}
+{#                                }#}
+{#                            });#}
+
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+
+            get_current_servers();
+            get_memory_usage();
+        }]);
+    </script>
+
+{% endblock %}

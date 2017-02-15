@@ -1,18 +1,50 @@
 import json
 
 import requests
+from flask.ext.login import current_user
 
 from orcaweb import app
 
 
-def get__configuration__applications():
-    response = requests.get("%s/config/applications" % app.config["ORCA_REWRITE_URL"])
+class NoSession(Exception):
+    def __init__(self, message, *args, **kwargs):
+        super(NoSession, self).__init__(*args, **kwargs)
+        self.message = message
+
+
+def __authenticated_get_request(uri):
+    from orcaweb.routes_base import session__get_hostname
+
+    response = requests.get("%s/%s&token=%s" % (session__get_hostname(), uri, current_user.get_id()))
+    if response.status_code == 403:
+        raise NoSession("Invalid or no session")
     return json.loads(response.text)
+
+
+def __authenticated_post_request(uri, data):
+    from orcaweb.routes_base import session__get_hostname
+
+    response = requests.post("%s/%s&token=%s" % (session__get_hostname(), uri, current_user.get_id()), data=data)
+    if response.status_code == 403:
+        raise NoSession("Invalid or no session")
+    return json.loads(response.text)
+
+
+def authenticate(hostname, username, password):
+    response = requests.get("%s/authenticate?username=%s&password=%s" % (hostname, username, password))
+    if response.status_code == 200:
+        response_object = json.loads(response.text)
+        return response_object["Token"]
+    return None
+
+
+def get__configuration__applications():
+    response = __authenticated_get_request("config/applications?")
+    return response
 
 
 def get__audit():
-    response = requests.get("%s/audit" % app.config["ORCA_REWRITE_URL"])
-    return json.loads(response.text)
+    return __authenticated_get_request("state/cloud/audit?")
 
 
 def get__configuration__applications_app(name):
@@ -23,49 +55,70 @@ def get__configuration__applications_app(name):
 
 
 def set__configuration__applications_app(name, object):
-    requests.post("%s/config/applications?application=%s" % (app.config["ORCA_REWRITE_URL"], name), data=json.dumps(object))
+    __authenticated_post_request("config/applications?application=%s" % (name), data=json.dumps(object))
 
 
 def get__configuration__applications_app__config(name):
-    response = requests.get("%s/config/applications/configuration/latest?application=%s" % (app.config["ORCA_REWRITE_URL"], name))
-    return json.loads(response.text)
+    response = __authenticated_get_request("config/applications/configuration/latest?application=%s" % (name))
+    return response
 
 
 def get__status__servers():
-    response = requests.get("%s/state" % (app.config["ORCA_REWRITE_URL"]))
-    return json.loads(response.text)
+    response = __authenticated_get_request("state?")
+    return response
 
 
 def set__configuration__applications_app__config(appName, object):
-    requests.post("%s/config/applications/configuration/latest?application=%s" % (app.config["ORCA_REWRITE_URL"], appName), data=json.dumps(object))
+    __authenticated_post_request("config/applications/configuration/latest?application=%s" % (appName),
+                                 data=json.dumps(object))
 
 
 def get__configuration__cloud():
-    response = requests.get("%s/state/config/cloud" % app.config["ORCA_REWRITE_URL"])
-    return json.loads(response.text)
+    response = __authenticated_get_request("state/config/cloud?")
+    return response
 
 
 def get__configuration__cloud_state():
-    response = requests.get("%s/state/cloud" % app.config["ORCA_REWRITE_URL"])
-    return json.loads(response.text)
+    response = __authenticated_get_request("state/cloud?")
+    return response
+
+def get__status__server(name):
+    response = __authenticated_get_request("state?")[name]
+    return response
 
 
 def set__configuration__cloud(object):
-    requests.post("%s/state/config/cloud" % app.config["ORCA_REWRITE_URL"], data=json.dumps(object))
+    __authenticated_post_request("state/config/cloud?", data=json.dumps(object))
 
 
 def get__status__application_statistics(application_name):
-    response = requests.get(
-        "%s/state/cloud/application/performance?application=%s" % (app.config["ORCA_REWRITE_URL"], application_name))
-    return json.loads(response.text)
+    response = __authenticated_get_request("state/cloud/application/performance?application=%s" % (application_name))
+    return response
 
 
 def get__status__application_count(application_name):
-    response = requests.get(
-        "%s/state/cloud/application/count?application=%s" % (app.config["ORCA_REWRITE_URL"], application_name))
-    return json.loads(response.text)
+    response = __authenticated_get_request("state/cloud/application/count?application=%s" % (application_name))
+    return response
 
 
 def get__status__application_events(application_name):
-    response = requests.get("%s/audit?application=%s" % (app.config["ORCA_REWRITE_URL"], application_name))
-    return json.loads(response.text)
+    response = __authenticated_get_request("state/cloud/application/audit?application=%s" % (application_name))
+    return response
+
+
+def get__status__application_logs(application_name):
+    response = __authenticated_get_request("state/cloud/application/logs?application=%s" % (application_name))
+    return response
+
+def get__status__server_logs(server):
+    response = __authenticated_get_request("state/cloud/host/logs?host=%s" % (server))
+    return response
+
+def get__status__server_audit(server):
+    response = __authenticated_get_request("state/cloud/host/audit?host=%s" % (server))
+    return response
+
+def get__status__server_memory(server):
+    response = __authenticated_get_request("state/cloud/host/performance?host=%s" % (server))
+    return response
+

@@ -1,10 +1,6 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-    <div>
-        <div class="topnavtitle">
-            Managing Application {{ name }}
-        </div>
-    </div>
+    <span class="topnavtitle">Managing Application {{ name }}</span>
 {% endblock %}
 {% block body %}
     <script>
@@ -31,7 +27,7 @@
     <div class="row">
         <div class="minor-navbar">
             {% include "application_navbar.html" %}
-                        <script>
+            <script>
                 $("#scaling-nav").addClass("selected")
             </script>
         </div>
@@ -80,7 +76,68 @@
                         </div>
                     </div>
                 </div>
+                <div class="row configuration_row">
+                    <table>
+                        <thead>
+                        <th>Day</th>
+                        <th>Midnight</th>
+                        <th>1AM</th>
+                        <th>2AM</th>
+                        <th>3AM</th>
+                        <th>4AM</th>
+                        <th>5AM</th>
+                        <th>6AM</th>
+                        <th>7AM</th>
+                        <th>8AM</th>
+                        <th>9AM</th>
+                        <th>10AM</th>
+                        <th>11AM</th>
+                        <th>12AM</th>
+                        <th>1PM</th>
+                        <th>2PM</th>
+                        <th>3PM</th>
+                        <th>4PM</th>
+                        <th>5PM</th>
+                        <th>6PM</th>
+                        <th>7PM</th>
+                        <th>8PM</th>
+                        <th>9PM</th>
+                        <th>10PM</th>
+                        <th>11PM</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="day in main.application.DeploymentSchedule.Schedule">
 
+                            <td>-</td>
+                            <td><input type="number" class="form-control" ng-model="day[0]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[60]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[120]" placeholder="LB"></td>
+                           <td> <input type="number" class="form-control" ng-model="day[180]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[240]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[300]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[360]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[420]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[480]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[540]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[600]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[660]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[720]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[780]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[840]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[900]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[960]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[1020]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[1080]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[1140]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[1200]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[1260]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[1320]" placeholder="LB"></td>
+                            <td><input type="number" class="form-control" ng-model="day[1380]" placeholder="LB"></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
                 <br>
                 <button type="submit" class="btn btn-default">Save Settings</button>
                 <br><br>

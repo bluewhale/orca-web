@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-    <div class="topnavtitle">Applications</div>
+    <span class="topnavtitle">Applications</span>
 {% endblock %}
 {% block body %}
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
@@ -42,15 +42,23 @@
 
             <br>
             {% raw %}
-            <ul class="list-group">
-                <li class="list-group-item" ng-repeat="application in main.applications">
-                    <span class="badge" ng-bind="application.Version"></span>
-                    <a href="/application/{{ application.Name }}/overview" ng-bind="application.Name"></a>
-                </li>
-                <li class="list-group-item">
-                    <a onclick="window.open_add_application();">Add Application</a>
-                </li>
-            </ul>
+            <div ng-repeat="(key, value) in main.applications">
+                <div ng-bind="key"></div>
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="application in value">
+                        <span class="badge" ng-bind="application.Version"></span>
+                        <a href="/application/{{ application.Name }}/overview" ng-bind="application.Name"></a>
+
+                        <span>Min: <span ng-bind="application.MinDeployment"></span></span>
+                        <span>Desired: <span ng-bind="application.DesiredDeployment"></span></span>
+                        <span>Running: <span ng-bind="application.Running"></span></span>
+                        <span>Failed: <span ng-bind="application.Failed"></span></span>
+                    </li>
+                    <li class="list-group-item">
+                        <a onclick="window.open_add_application();">Add Application</a>
+                    </li>
+                </ul>
+            </div>
             {% endraw %}
             <script>
                 angular.module("ApplicationsDashboard", []).controller("Main", ["$http", function ($http) {
@@ -58,11 +66,11 @@
                     self.newApplication = {};
                     self.applications = [];
 
-                    var get_applications = function(){
-                        return $http.get("/applications").then(
-                                function(response){
+                    var get_applications = function () {
+                        return $http.get("/ajax/applications/by/vpc").then(
+                                function (response) {
                                     self.applications = response.data["applications"]
-                                }, function(err){
+                                }, function (err) {
                                     console.log("err")
                                 }
                         )
@@ -70,8 +78,8 @@
                     get_applications();
 
                     console.log(self.applications);
-                    self.add_application = function(){
-                        $http.post("/application", self.newApplication).then(function(response){
+                    self.add_application = function () {
+                        $http.post("/application", self.newApplication).then(function (response) {
                             self.newApplication = {};
                             get_applications();
                             $("#addappmodal").modal("hide");
