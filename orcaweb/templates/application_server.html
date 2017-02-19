@@ -1,33 +1,26 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-    <span class="topnavtitle">Managing Application {{ name }} Server {{ serverid }}</span>
+    <span class="topnavtitle">Performance Metrics for <a href="/application/{{ name }}/overview">{{ name }}</a> on <a href="/server/{{ serverid }}/overview">{{ serverid }}</a></span>
 {% endblock %}
 {% block body %}
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-
     <script>
         window.toggle_main_nav("leftnav_applications");
     </script>
-    <br>
     <div ng-app="ApplicationSettings">
         <div ng-controller="Main as main">
             <div class="configuration_row row">
                 <div class="col-md-12">
-                    <h4>Statistics</h4>
-
-                    <div>
+                    <div class="box graphbox">
                         <div class="statpill-name">Memory Utilisation</div>
-                        <div class="statpill-metric" ng-bind="main.desired_servers_count"></div>
                         <div id="memory_graph" style="height:200px;"></div>
                     </div>
-
-                    <div>
+                    <br>
+                    <div class="box graphbox">
                         <div class="statpill-name">CPU Utilisation</div>
-                        <div class="statpill-metric" ng-bind="main.desired_servers_count"></div>
                         <div id="cpu_graph" style="height:200px;"></div>
                     </div>
-                    <div>
+                    <br>
+                    <div class="box graphbox">
                         <div class="statpill-name">Network Utilisation</div>
                         <div id="network_graph" style="height:200px;"></div>
                     </div>
@@ -38,21 +31,30 @@
 
     <script>
         angular.module("ApplicationSettings", []).controller("Main", ["$http", function ($http) {
-            var self = this;
-            self.servers = [];
-            self.servers_desired = [];
-            self.current_servers_count = 0;
-            self.desired_servers_count = 0;
-
             var get_memory_usage = function () {
+                window.push_loading();
                 return $http.get("/ajax/application/{{ name }}/servers/{{ serverid }}/memory").then(
                         function (response) {
+                            window.pop_loading();
                             var memory_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                memory_usage.push(response.data.memory[i]["Mbytes"]);
+                                var timestamp = moment.parseZone(response.data.memory[i]["Timestamp"]).unix();
+                                console.log("mm: " + timestamp);
+                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Mbytes"]]);
+                            }
+
+                            var cpu_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Cpu"]]);
+                            }
+
+                            var network_usage = [];
+                            for (var i = 0; i < response.data.memory.length; i++) {
+                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Network"]]);
                             }
 
                             console.log(memory_usage);
+
                             Highcharts.chart('memory_graph', {
                                 chart: {
                                     type: 'areaspline'
@@ -61,10 +63,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: 'datetime'
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -72,18 +75,14 @@
                                     }
                                 },
                                 series: [{
-                                    showInLegend: false,
+                                    showInLegend: true,
                                     data: memory_usage,
                                     marker: {
                                         enabled: false
-                                    }
+                                    },
+                                    name: ''
                                 }]
                             });
-
-                            var cpu_usage = [];
-                            for (var i = 0; i < response.data.memory.length; i++) {
-                                cpu_usage.push(response.data.memory[i]["Cpu"]);
-                            }
 
                             Highcharts.chart('cpu_graph', {
                                 chart: {
@@ -93,10 +92,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: 'datetime'
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -104,7 +104,7 @@
                                     }
                                 },
                                 series: [{
-                                    showInLegend: false,
+                                    showInLegend: true,
                                     data: cpu_usage,
                                     marker: {
                                         enabled: false
@@ -112,10 +112,6 @@
                                 }]
                             });
 
-                            var network_usage = [];
-                            for (var i = 0; i < response.data.memory.length; i++) {
-                                network_usage.push(response.data.memory[i]["Network"]);
-                            }
 
                             Highcharts.chart('network_graph', {
                                 chart: {
@@ -125,10 +121,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: 'datetime'
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -148,9 +145,6 @@
                                     }
                                 }
                             });
-
-                        }, function (err) {
-                            console.log("err")
                         }
                 )
             };

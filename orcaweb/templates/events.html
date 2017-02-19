@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-    <div class="topnavtitle">Audit Trail</div>
+    <div class="topnavtitle">Audit and Events for all Instances/Applications</div>
 {% endblock %}
 {% block body %}
     <script>
@@ -8,30 +8,73 @@
     </script>
     <br>
 
-    <div ng-app="Audit">
+    <div ng-app="ServerSettings">
         <div ng-controller="Main as main">
-            <div class="configuration_row row">
-                <div class="col-md-12">
-
-                    <ul class="list-group">
-                        <li class="list-group-item" ng-repeat="event in main.events">
-                            <span ng-bind="event.Timestamp"></span> - <span ng-bind="event.Severity"></span> - <span ng-bind="event.Message"></span>
-                        </li>
-                    </ul>
-                </div>
+            <div class="logtablebody" style="">
+                <span class="logtablebody-title">Audit Events</span>
+                <form class="form-inline logtablesearch" style="" ng-submit="main.search()">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="exampleInputName2" placeholder="Search"
+                               ng-model="main.search_expression">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control" ng-model="main.limit">
+                            <option value="10">10 Entries</option>
+                            <option value="100">100 Entries</option>
+                            <option value="500">500 Entries</option>
+                            <option value="1000">1000 Entries</option>
+                            <option value="5000">5000 Entries</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-default">Search</button>
+                </form>
             </div>
+            <table class="table">
+                <tbody>
+                {% raw %}
+                <tr ng-repeat="event in main.events">
+                    <td>
+                        <span ng-bind="event.Timestamp"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="event.Severity"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="event.Message"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <div ng-show="main.empty"><i>No Instances Found</i></div>
+                </tr>
+                {% endraw %}
+                </tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        angular.module("Audit", []).controller("Main", ["$http", function ($http) {
+        angular.module("ServerSettings", []).controller("Main", ["$http", function ($http) {
             var self = this;
-            self.servers = [];
+            self.events = [];
+            self.empty = 0;
+            self.search_expression = "";
+            self.limit = "100";
 
             var get_events = function () {
-                return $http.get("/ajax/events").then(
+                window.push_loading();
+                self.events = [];
+
+                return $http.get("/ajax/events?search=" + self.search_expression + "&limit=" + self.limit).then(
                         function (response) {
-                            self.events = response.data.events;
+                            window.pop_loading();
+                            var events = response.data.events;
+                            for (var i = events.length - 1; i >= 0; i--) {
+                                var event = events[i];
+                                event["Timestamp"] = moment.parseZone(event["Timestamp"]).toDate();
+                                self.events.push(event);
+                            }
+
+                            self.empty = events.length == 0;
                         }, function (err) {
                             console.log("err")
                         }
@@ -39,6 +82,10 @@
             };
 
             get_events();
+            self.search = function () {
+                get_events();
+            }
         }]);
     </script>
+
 {% endblock %}

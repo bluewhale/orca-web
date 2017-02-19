@@ -36,7 +36,6 @@
         }
 
         .statpill-name {
-            text-transform: uppercase;
         }
 
         .statpill-root {
@@ -54,41 +53,67 @@
             </script>
         </div>
     </div>
-
+    <br>
     <div ng-app="ServerOverview">
         <div ng-controller="Main as main">
-            <div>
-                <div>FirstSeen: <span ng-bind="main.server.FirstSeen"></span></div>
-                <div>LastSeen: <span ng-bind="main.server.LastSeen"></span></div>
-                <div>Ip Address: <span ng-bind="main.server.Ip"></span></div>
-                <div>Network: <span ng-bind="main.server.Network"></span></div>
-                <div>SecurityGroups: <span ng-repeat="sgroup in main.server.SecurityGroups"><span
-                        ng-bind="sgroup.Group"></span></span></div>
-                <div>State: <span ng-bind="main.server.State"></span></div>
-                <div>SpotInstance: <span ng-bind="main.server.SpotInstance"></span></div>
-            </div>
-            <div><div id="cpu_graph"></div></div>
-            <div><div id="memory_graph"></div></div>
-            <div><div id="network_graph"></div></div>
-            <div><div id="hdd_graph"></div></div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="box graphbox">
+                        <div class="statpill-name">CPU Utilisation</div>
+                        <div style="height:200px;" id="cpu_graph"></div>
+                    </div>
+                    <br>
+                    <div class="box graphbox">
+                        <div class="statpill-name">Memory Utilisation</div>
+                        <div style="height:200px;" id="memory_graph"></div>
+                    </div>
+                    <br>
+                    <div class="box graphbox">
+                        <div class="statpill-name">Memory Utilisation</div>
+                        <div style="height:200px;" id="network_graph"></div>
+                    </div>
+                    <br>
+                    <div class="box graphbox">
+                        <div class="statpill-name">HDD Utilisation</div>
+                        <div style="height:200px;" id="hdd_graph"></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="box graphbox">
+                        <div class="statpill-name">Server Details</div>
 
-            <div>
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="app in main.server.Apps">
-                        <span ng-bind="app.Name"></span>
-                    </li>
-                </ul>
+                        <div>FirstSeen: <span ng-bind="main.server.FirstSeen"></span></div>
+                        <div>LastSeen: <span ng-bind="main.server.LastSeen"></span></div>
+                        <div>Ip Address: <span ng-bind="main.server.Ip"></span></div>
+                        <div>Network: <span ng-bind="main.server.Network"></span></div>
+                        <div>SecurityGroups: <span ng-repeat="sgroup in main.server.SecurityGroups"><span
+                                ng-bind="sgroup.Group"></span></span></div>
+                        <div>State: <span ng-bind="main.server.State"></span></div>
+                        <div>SpotInstance: <span ng-bind="main.server.SpotInstance"></span></div>
+                    </div>
+                    <br>
+
+                    <div class="box graphbox">
+                        <div class="statpill-name">Apps Deployed</div>
+                        <div ng-repeat="app in main.server.Apps">
+                            <span ng-bind="app.Name"></span>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="box graphbox">
+                        <div class="statpill-name">Queued Changes</div>
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="app in main.server.Changes">
+                                <span ng-bind="app.Type"></span>
+                                <span ng-bind="app.Time"></span>
+                                <span ng-bind="app.Name"></span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
             </div>
 
-            <div>
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="app in main.server.Changes">
-                        <span ng-bind="app.Type"></span>
-                        <span ng-bind="app.Time"></span>
-                        <span ng-bind="app.Name"></span>
-                    </li>
-                </ul>
-            </div>
         </div>
     </div>
 
@@ -96,8 +121,11 @@
         angular.module("ServerOverview", []).controller("Main", ["$http", function ($http) {
             var self = this;
             var get_current_servers = function () {
+                window.push_loading();
+
                 return $http.get("/ajax/server/{{ name }}").then(
                         function (response) {
+                            window.pop_loading();
                             self.server = response.data.server;
                         }, function (err) {
                             console.log("err")
@@ -106,26 +134,30 @@
             };
 
             var get_memory_usage = function () {
+                window.push_loading();
+
                 return $http.get("/ajax/server/{{ name }}/memory").then(
                         function (response) {
+                        window.pop_loading();
+
                             var cpu_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                cpu_usage.push(response.data.memory[i]["Cpu"]);
+                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Cpu"]]);
                             }
 
                             var memory_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                memory_usage.push(response.data.memory[i]["Mbytes"]);
+                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Mbytes"]]);
                             }
 
                             var network_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                network_usage.push(response.data.memory[i]["Network"]);
+                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Network"]]);
                             }
 
                             var hdd_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                hdd_usage.push(response.data.memory[i]["HardDiskUsagePercent"]);
+                                hdd_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["HardDiskUsagePercent"]]);
                             }
 
                             Highcharts.chart('cpu_graph', {
@@ -136,10 +168,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: "datetime"
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -164,10 +197,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: "datetime"
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -192,10 +226,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: "datetime"
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -220,10 +255,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: "datetime"
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -239,109 +275,6 @@
                                     name: "HDD Percentage Running"
                                 }]
                             });
-
-
-{#                            var memory_usage = [];#}
-{#                            for (var i = 0; i < response.data.memory.length; i++) {#}
-{#                                memory_usage.push(response.data.memory[i]["Mbytes"]);#}
-{#                            }#}
-{##}
-{#                            console.log(memory_usage);#}
-{#                            Highcharts.chart('memory_graph', {#}
-{#                                chart: {#}
-{#                                    type: 'areaspline'#}
-{#                                },#}
-{#                                title: {text: ''},#}
-{#                                exporting: {enabled: false},#}
-{#                                credits: {enabled: false},#}
-{#                                xAxis: {#}
-{#                                    visible: false#}
-{#                                },#}
-{#                                yAxis: {#}
-{#                                    visible: false#}
-{#                                },#}
-{#                                plotOptions: {#}
-{#                                    areaspline: {#}
-{#                                        fillOpacity: 0.5#}
-{#                                    }#}
-{#                                },#}
-{#                                series: [{#}
-{#                                    showInLegend: false,#}
-{#                                    data: memory_usage,#}
-{#                                    marker: {#}
-{#                                        enabled: false#}
-{#                                    }#}
-{#                                }]#}
-{#                            });#}
-{##}
-{#                            var cpu_usage = [];#}
-{#                            for (var i = 0; i < response.data.memory.length; i++) {#}
-{#                                cpu_usage.push(response.data.memory[i]["Cpu"]);#}
-{#                            }#}
-{##}
-{#                            Highcharts.chart('cpu_graph', {#}
-{#                                chart: {#}
-{#                                    type: 'areaspline'#}
-{#                                },#}
-{#                                title: {text: ''},#}
-{#                                exporting: {enabled: false},#}
-{#                                credits: {enabled: false},#}
-{#                                xAxis: {#}
-{#                                    visible: false#}
-{#                                },#}
-{#                                yAxis: {#}
-{#                                    visible: false#}
-{#                                },#}
-{#                                plotOptions: {#}
-{#                                    areaspline: {#}
-{#                                        fillOpacity: 0.5#}
-{#                                    }#}
-{#                                },#}
-{#                                series: [{#}
-{#                                    showInLegend: false,#}
-{#                                    data: cpu_usage,#}
-{#                                    marker: {#}
-{#                                        enabled: false#}
-{#                                    }#}
-{#                                }]#}
-{#                            });#}
-{##}
-{#                            var network_usage = [];#}
-{#                            for (var i = 0; i < response.data.memory.length; i++) {#}
-{#                                network_usage.push(response.data.memory[i]["Network"]);#}
-{#                            }#}
-{##}
-{#                            Highcharts.chart('network_graph', {#}
-{#                                chart: {#}
-{#                                    type: 'areaspline'#}
-{#                                },#}
-{#                                title: {text: ''},#}
-{#                                exporting: {enabled: false},#}
-{#                                credits: {enabled: false},#}
-{#                                xAxis: {#}
-{#                                    visible: false#}
-{#                                },#}
-{#                                yAxis: {#}
-{#                                    visible: false#}
-{#                                },#}
-{#                                plotOptions: {#}
-{#                                    areaspline: {#}
-{#                                        fillOpacity: 0.5#}
-{#                                    }#}
-{#                                },#}
-{#                                series: [{#}
-{#                                    showInLegend: false,#}
-{#                                    data: network_usage,#}
-{#                                    marker: {#}
-{#                                        enabled: false#}
-{#                                    }#}
-{#                                }],#}
-{#                                line: {#}
-{#                                    marker: {#}
-{#                                        enabled: false#}
-{#                                    }#}
-{#                                }#}
-{#                            });#}
 
                         }, function (err) {
                             console.log("err")

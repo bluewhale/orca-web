@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-    <span class="topnavtitle">Applications</span>
+    <span class="topnavtitle">Application Overview</span>
 {% endblock %}
 {% block body %}
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
@@ -12,81 +12,290 @@
                     $("#addappmodal").modal("show");
                 };
             </script>
+            <style>
+                .selected {
+                    background-color: whitesmoke;
+                }
 
-            <div id="addappmodal" class="modal fade" tabindex="-1" role="dialog">
-                <form name="add" ng-submit="main.add_application()">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                        aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title">Create New Application</h4>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label>Application Name</label>
-                                    <input type="text" class="form-control" ng-model="main.newApplication.Name">
+                .appNavItem:hover {
+                    background-color: whitesmoke;
+                }
+            </style>
+
+            <div class="row">
+
+                <div class="col-md-2">
+                    <div id="appNav">
+                        <div id="nav__all_applications" ng-click="main.show__all_applications()" class="appNavItem"><i
+                                class="fa fa-th-large icon-fixed-width" aria-hidden="true"></i> All
+                            Applications
+
+                        </div>
+                        <div id="nav__deploying" ng-click="main.show__scaling()" class="appNavItem">
+                            <i class="fa fa fa-line-chart icon-fixed-width" aria-hidden="true"></i> Scaling <span ng-show="main.scaling_count > 0" class="badge" ng-bind="main.scaling_count"></span>
+                        </div>
+                        <div id="nav__offline" ng-click="main.show__offline_and_warnings()" class="appNavItem">
+                            <i class="fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Offline  <span ng-show="main.offline_count > 0" class="badge" ng-bind="main.offline_count"></span>
+                        </div>
+
+                        <br><br>
+                        {% raw %}
+                        <div ng-repeat="(key, value) in main.networks">
+                            <div id="nav__network_{{ key }}" ng-click="main.show_network(key)" class="appNavItem"><i
+                                    class="fa fa fa-cloud icon-fixed-width" aria-hidden="true"></i><span
+                                    ng-bind="key"></span></div>
+                        </div>
+                        {% endraw %}
+                    </div>
+                </div>
+                <div class="col-md-10" id="appBody">
+
+                    <style>
+                        .box {
+                            height: 200px;
+                            border: solid 1px #e0dbdb;
+                            border-radius: 4px;
+                            margin: 2px;
+                            background-color: white;;
+                        }
+
+                        .boxtitle {
+                            height: 40px;
+                            background-color: whitesmoke;
+                            padding: 10px;
+                        }
+
+                        .boxbody {
+                            padding: 10px;
+                        }
+
+                        .col-md-4 {
+                            padding-right: 10px;
+                            padding-left: 10px;
+                            padding-top: 10px;
+                            padding-bottom: 10px;
+                        }
+
+                        .boxtitle a {
+                            font-size: 15px;
+                            text-decoration: underline;
+                        }
+
+                        .runningCountTitle {
+
+                        }
+                    </style>
+
+                    <div class="row">
+                        {% raw %}
+                        <div style="" ng-repeat="group in main.groupedApplications">
+                            <div class="row">
+                                <div class="col-md-4" style="">
+                                    <div class="box" style="">
+                                        <div class="boxtitle">
+                                            <a href="/application/{{ group[0].Name }}/overview"
+                                               ng-bind="group[0].Name"></a>
+                                        </div>
+                                        <div class="boxbody">
+                                            <div><span class="statusTitle">Status:</span> <span
+                                                    ng-bind="group[0].Status"></span></div>
+                                            <hr>
+                                            <div><span class="countTitle">Running: </span> <span
+                                                    ng-bind="group[0].Running"></span></div>
+                                            <div><span class="countTitle">Desired: </span> <span
+                                                    ng-bind="group[0].DesiredDeployment"></span></div>
+                                            <div><span class="countTitle">Failed: </span> <span
+                                                    ng-bind="group[0].Failed"></span></div>
+                                        </div>
+                                    </div>
                                 </div>
-
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-primary">
-                                    Save
-                                </button>
+                                <div ng-show="group[1].Name" class="col-md-4" style="">
+                                    <div class="box" style="">
+                                        <div class="boxtitle">
+                                            <a href="/application/{{ group[1].Name }}/overview"
+                                               ng-bind="group[1].Name"></a>
+                                        </div>
+                                        <div class="boxbody">
+                                            <div><span class="statusTitle">Status:</span> <span
+                                                    ng-bind="group[1].Status"></span></div>
+                                            <hr>
+                                            <div><span class="countTitle">Running: </span> <span
+                                                    ng-bind="group[1].Running"></span></div>
+                                            <div><span class="countTitle">Desired: </span> <span
+                                                    ng-bind="group[1].DesiredDeployment"></span></div>
+                                            <div><span class="countTitle">Failed: </span> <span
+                                                    ng-bind="group[1].Failed"></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div ng-show="group[2].Name" class="col-md-4" style="">
+                                    <div class="box" style="">
+                                        <div class="boxtitle">
+                                            <a href="/application/{{ group[2].Name }}/overview"
+                                               ng-bind="group[2].Name"></a>
+                                        </div>
+                                        <div class="boxbody">
+                                            <div><span class="statusTitle">Status:</span> <span
+                                                    ng-bind="group[2].Status"></span></div>
+                                            <hr>
+                                            <div><span class="countTitle">Running: </span> <span
+                                                    ng-bind="group[2].Running"></span></div>
+                                            <div><span class="countTitle">Desired: </span> <span
+                                                    ng-bind="group[2].DesiredDeployment"></span></div>
+                                            <div><span class="countTitle">Failed: </span> <span
+                                                    ng-bind="group[2].Failed"></span></div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        {% endraw %}
                     </div>
-                </form>
+                </div>
             </div>
+        </DIV>
+        <div id="addappmodal" class="modal fade" tabindex="-1" role="dialog">
+            <form name="add" ng-submit="main.add_application()">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Create New Application</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Application Name</label>
+                                <input type="text" class="form-control" ng-model="main.newApplication.Name">
+                            </div>
 
-            <br>
-            {% raw %}
-            <div ng-repeat="(key, value) in main.applications">
-                <div ng-bind="key"></div>
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="application in value">
-                        <span class="badge" ng-bind="application.Version"></span>
-                        <a href="/application/{{ application.Name }}/overview" ng-bind="application.Name"></a>
-
-                        <span>Min: <span ng-bind="application.MinDeployment"></span></span>
-                        <span>Desired: <span ng-bind="application.DesiredDeployment"></span></span>
-                        <span>Running: <span ng-bind="application.Running"></span></span>
-                        <span>Failed: <span ng-bind="application.Failed"></span></span>
-                    </li>
-                    <li class="list-group-item">
-                        <a onclick="window.open_add_application();">Add Application</a>
-                    </li>
-                </ul>
-            </div>
-            {% endraw %}
-            <script>
-                angular.module("ApplicationsDashboard", []).controller("Main", ["$http", function ($http) {
-                    var self = this;
-                    self.newApplication = {};
-                    self.applications = [];
-
-                    var get_applications = function () {
-                        return $http.get("/ajax/applications/by/vpc").then(
-                                function (response) {
-                                    self.applications = response.data["applications"]
-                                }, function (err) {
-                                    console.log("err")
-                                }
-                        )
-                    };
-                    get_applications();
-
-                    console.log(self.applications);
-                    self.add_application = function () {
-                        $http.post("/application", self.newApplication).then(function (response) {
-                            self.newApplication = {};
-                            get_applications();
-                            $("#addappmodal").modal("hide");
-                        });
-                    }
-                }]);
-            </script>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
+
+        <br>
+        <script>
+            angular.module("ApplicationsDashboard", []).controller("Main", ["$http", function ($http) {
+                var self = this;
+                self.newApplication = {};
+                self.applications = [];
+                self.groupedApplications = [];
+                self.networks = {};
+                self.scaling_count = 0;
+                self.offline_count = 0;
+
+                var get_applications = function (filter_method) {
+                    window.push_loading();
+
+                    self.applications = [];
+                    self.groupedApplications = [];
+                    self.scaling_count = 0;
+                    self.offline_count = 0;
+
+                    return $http.get("/ajax/applications/by/vpc").then(
+                            function (response) {
+                                window.pop_loading();
+
+                                for (var i = 0; i < response.data["applications"].length; i++) {
+                                    if (filter_method == undefined || filter_method(response.data["applications"][i])) {
+                                        self.applications.push(response.data["applications"][i]);
+                                    }
+                                }
+
+                                for (var i = 0; i < self.applications.length; i += 3) {
+                                    self.groupedApplications.push([self.applications[i], self.applications[i + 1], self.applications[i + 2]]);
+                                }
+
+                                for (var i = 0; i < self.applications.length; i++) {
+                                    $.each(self.applications[i]["Config"], function (key, value) {
+                                        self.networks[value["Network"]] = true
+                                    });
+                                }
+
+                                for (var i = 0; i < self.applications.length; i++) {
+                                    if(self.applications[i]["Running"] == 0){
+                                        self.offline_count += 1;
+                                    }
+                                    if (self.applications[i]["Running"] != self.applications[i]["DesiredDeployment"]) {
+                                        self.scaling_count += 1;
+                                    }
+                                }
+                            }, function (err) {
+                                console.log("err")
+                            }
+                    )
+                };
+
+                self.show__all_applications = function () {
+                    $(".appNavItem").removeClass("selected");
+                    $("#nav__all_applications").addClass("selected");
+                    get_applications();
+                };
+
+                self.show__offline_and_warnings = function () {
+                    $(".appNavItem").removeClass("selected");
+                    $("#nav__offline").addClass("selected");
+
+                    get_applications(function (item) {
+                        if (item["Running"] == 0) {
+                            return true;
+                        }
+
+                        if (!item["Enabled"]) {
+                            return true;
+                        }
+
+                        return false;
+                    });
+                };
+
+                self.show__scaling = function () {
+                    $(".appNavItem").removeClass("selected");
+                    $("#nav__deploying").addClass("selected");
+
+                    get_applications(function (item) {
+                        if (item["Running"] != item["DesiredDeployment"]) {
+                            return true;
+                        }
+
+                        return false;
+                    });
+                };
+
+                self.show_network = function (network) {
+                    $(".appNavItem").removeClass("selected");
+                    $("#nav__network_" + network).addClass("selected");
+
+                    get_applications(function (item) {
+                        for (var key in item["Config"]) {
+                            if (item["Config"][key]["Network"] == network) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+                };
+
+                self.add_application = function () {
+                    $http.post("/application", self.newApplication).then(function (response) {
+                        self.newApplication = {};
+                        get_applications();
+                        $("#addappmodal").modal("hide");
+                    });
+                }
+
+                self.show__all_applications();
+            }]);
+        </script>
+    </div>
     </div>
 {% endblock %}

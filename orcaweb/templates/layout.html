@@ -5,9 +5,13 @@
 <link rel="stylesheet" href="/static/style/bootstrap.min.css">
 <script src="/static/libs/bootstrap.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.js"></script>
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
       integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
 
 </head>
 
@@ -46,10 +50,11 @@
     }
 
     #mainsection {
-        /*display: table-cell;*/
-        margin-left: 260px;
         right: 0px;
         vertical-align: top;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 5px;
     }
 
     #top {
@@ -86,7 +91,9 @@
     .topnavtitle {
         padding-left: 20px;
         padding-top: 10px;
-        font-size: 17px;
+        font-size: 15px;
+        color: #666;
+        font-weight: 500;
     }
 
     .subtitle {
@@ -139,50 +146,200 @@
     }
 
     .topnavtitle {
-        display:inline;
+        display: inline;
     }
 
-    #top{
-        padding-right:10px;
-        padding-top:10px;
+    #top {
+        padding-right: 10px;
+        padding-top: 16px;
     }
 
     #connectedto {
-        padding-right:50px;
+        padding-right: 50px;
     }
+
+    .statpill-name {
+        padding-bottom: 20px;
+    }
+
 </style>
+
+
+<style>
+    /* New Navigation Menu */
+    #topnav {
+        background-color: #2196F3;
+        height: 60px;
+    {#        box-shadow: 3px 2px 2px 0 rgba(0, 0, 0, .16), 0 0 2px 0 rgba(0, 0, 0, .12);#} color: white;
+    }
+
+    body {
+    {#        background-color: #fafafa;#}
+    }
+
+    #appNav {
+        width: 200px;
+        display: inline-table;
+        padding-top: 15px;
+    }
+
+    #appBody {
+        display: inline-table;
+    }
+
+    .appNavItem {
+        padding-top: 7px;
+        padding-bottom: 7px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #827b7b;
+        padding-left: 10px;
+    }
+
+    .appNavItem .fa {
+        padding-right: 9px;
+    }
+
+    .orcatitle {
+        display: inline-table;
+        margin-top: 14px;
+        margin-left: 20px;
+        margin-right: 20px;
+        font-weight: bold;
+        font-size: 21px;
+    }
+
+    .leftnavitem {
+        display: inline;
+        color: white;
+    }
+
+    .rightnavitem {
+        float: right;
+        display: inline;
+    }
+
+    .navitem {
+        display: inline;
+    }
+
+    .navitem a {
+        color: white;
+        font-size: 15px;
+    }
+
+    .rightnavitem {
+        display: inline-table;
+        margin-top: 20px;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .box {
+        border: solid 1px #e0dbdb;
+        border-radius: 4px;
+        margin: 2px;
+        background-color: white;;
+    }
+
+    .formbox {
+        padding-left: 20px;
+    }
+
+    .graphbox {
+        padding: 20px;
+    }
+
+    .logtablebody {
+        padding-bottom: 20px;
+        padding-top: 10px;
+    }
+
+    .logtablebody-title {
+        padding-left: 10px;
+    }
+
+    .logtablesearch {
+        float: right;
+    }
+
+    .hoverselect:hover {
+        background-color: whitesmoke;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        background-color: #333;
+
+        border-radius: 100%;
+        -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+        animation: sk-scaleout 1.0s infinite ease-in-out;
+    }
+
+    @-webkit-keyframes sk-scaleout {
+        0% {
+            -webkit-transform: scale(0)
+        }
+        100% {
+            -webkit-transform: scale(1.0);
+            opacity: 0;
+        }
+    }
+
+    @keyframes sk-scaleout {
+        0% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+        100% {
+            -webkit-transform: scale(1.0);
+            transform: scale(1.0);
+            opacity: 0;
+        }
+    }</style>
 
 <script>
     window.toggle_main_nav = function (identifier) {
         $(".navitem").removeClass("selected");
         $("#" + identifier).addClass("selected");
-    }
+    };
+
+    window.jqueryLoaderIncrementer = 0;
+    window.push_loading = function () {
+        window.jqueryLoaderIncrementer += 1;
+        $('#spinner').show();
+    };
+
+    window.pop_loading = function () {
+        window.jqueryLoaderIncrementer -= 1;
+        if (window.jqueryLoaderIncrementer == 0) {
+
+            $('#spinner').hide();
+        }
+    };
+
 </script>
 
-<div id="bodysection">
-    <div id="leftsection">
-        <div id="lefttitle">
-            <b>ORCA</b> gastrator
-        </div>
-        <div id="leftnav">
-            <div class="navitem selected" id="leftnav_applications"><a href="/"><i class="fa-fw fa fa-cubes"></i>
-                <span>Applications</span></a></div>
-            <div class="navitem selected" id="leftnav_servermap"><a href="/servers"><i class="fa-fw fa fa-server"></i>
-                <span>Servers</span></a></div>
-            <div class="navitem selected" id="leftnav_audit"><a href="/audit">
-                <i class="fa-fw fa fa-bell-o"></i> <span> Audit trail </span></a></div>
-            <div class="navitem" id="leftnav_settings"><a href="/settings"><i class="fa-fw fa fa-cog"></i>
-                <span> Settings</span></a></div>
-        </div>
-
+<div id="topnav">
+    <div class="orcatitle">orca</div>
+    <div class="leftnavitem">
+        <div class="navitem"><a href="/">Apps</a></div>
+        <div class="navitem"><a href="/servers">Servers</a></div>
+        <div class="navitem"><a href="/audit">Events</a></div>
     </div>
+    <div class="rightnavitem">
+        <div class="navitem"><a href="/settings">Settings</a></div>
+        <div class="navitem"><a href=""><i class="fa fa-sign-out" aria-hidden="true"></i></a></div>
+    </div>
+</div>
+
+<div id="bodysection">
     <div id="mainsection">
         <div id="top">
             <div>
                 {% block navigation_top %}{% endblock %}
-                <div class="connectedto pull-right">
-                    <span>Connected to {{ g.server }} as {{ g.username }}</span>
-                </div>
+                <div style="float:right; display: none;" class="spinner" id="spinner"></div>
             </div>
         </div>
         <div id="mainblock">

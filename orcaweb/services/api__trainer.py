@@ -43,8 +43,8 @@ def get__configuration__applications():
     return response
 
 
-def get__audit():
-    return __authenticated_get_request("state/cloud/audit?")
+def get__audit(search="", limit="100"):
+    return __authenticated_get_request("state/cloud/audit?&search=%s&limit=%s" % (search, limit))
 
 
 def get__configuration__applications_app(name):
@@ -77,6 +77,10 @@ def get__configuration__cloud():
     response = __authenticated_get_request("state/config/cloud?")
     return response
 
+def get__settings():
+    response = __authenticated_get_request("settings?")
+    return response
+
 
 def get__configuration__cloud_state():
     response = __authenticated_get_request("state/cloud?")
@@ -90,6 +94,9 @@ def get__status__server(name):
 def set__configuration__cloud(object):
     __authenticated_post_request("state/config/cloud?", data=json.dumps(object))
 
+def set__settings(object):
+    __authenticated_post_request("settings?", data=json.dumps(object))
+
 
 def get__status__application_statistics(application_name):
     response = __authenticated_get_request("state/cloud/application/performance?application=%s" % (application_name))
@@ -101,24 +108,28 @@ def get__status__application_count(application_name):
     return response
 
 
-def get__status__application_events(application_name):
-    response = __authenticated_get_request("state/cloud/application/audit?application=%s" % (application_name))
+def get__status__application_events(application_name, search="", limit="100"):
+    response = __authenticated_get_request("state/cloud/application/audit?application=%s&search=%s&limit=%s" % (application_name, search, limit))
     return response
 
 
-def get__status__application_logs(application_name):
-    response = __authenticated_get_request("state/cloud/application/logs?application=%s" % (application_name))
+def get__status__application_logs(application_name, search="", limit="100"):
+    response = __authenticated_get_request("state/cloud/application/logs?application=%s&search=%s&limit=%s" % (application_name, search, limit))
     return response
 
-def get__status__server_logs(server):
-    response = __authenticated_get_request("state/cloud/host/logs?host=%s" % (server))
+def get__status__server_logs(server, search="", limit="100"):
+    response = __authenticated_get_request("state/cloud/host/logs?host=%s&search=%s&limit=%s" % (server, search, limit))
     return response
 
-def get__status__server_audit(server):
-    response = __authenticated_get_request("state/cloud/host/audit?host=%s" % (server))
+def get__status__server_audit(server, search="", limit="100"):
+    response = __authenticated_get_request("state/cloud/host/audit?host=%s&search=%s&limit=%s" % (server,search, limit))
     return response
 
 def get__status__server_memory(server):
     response = __authenticated_get_request("state/cloud/host/performance?host=%s" % (server))
+    return response
+
+def get__status__application_server_memory(server, application):
+    response = __authenticated_get_request("state/cloud/application/host/performance?host=%s&application=%s" % (server, application))
     return response
 

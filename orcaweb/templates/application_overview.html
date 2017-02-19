@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-     <span class="topnavtitle">Managing Application {{ name }}</span>
+    <span class="topnavtitle">Managing Application {{ name }}</span>
 {% endblock %}
 {% block body %}
     <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -35,9 +35,6 @@
             font-size: 30px;
         }
 
-        .statpill-name {
-            text-transform: uppercase;
-        }
 
         .statpill-root {
             padding-left: 0px !important;
@@ -45,6 +42,7 @@
 
         .border-right {
         }
+
     </style>
     <div class="row">
         <div class="minor-navbar">
@@ -62,47 +60,43 @@
                     <div class="row">
                         <div class="col-md-8">
                             <div class="row">
-                                <div class="col-md-6 statpill-root border-right">
-                                    <div class="statpill">
-                                        <div class="statpill-name">Running Instances</div>
-                                        <div class="statpill-metric" ng-bind="main.current_servers_count"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
                                 <div class="col-md-12 statpill-root border-right">
-                                    <h4>Statistics</h4>
-
-                                    <div>
+                                    <div class="box graphbox">
+                                        <div class="statpill-name">Total Instances</div>
+                                        <div id="count_graph" style="height:200px;"></div>
+                                    </div>
+                                    <br>
+                                    <div class="box graphbox">
                                         <div class="statpill-name">Memory Utilisation</div>
                                         <div class="statpill-metric" ng-bind="main.desired_servers_count"></div>
                                         <div id="memory_graph" style="height:200px;"></div>
                                     </div>
-
-                                    <div>
+                                    <br>
+                                    <div class="box graphbox">
                                         <div class="statpill-name">CPU Utilisation</div>
                                         <div class="statpill-metric" ng-bind="main.desired_servers_count"></div>
                                         <div id="cpu_graph" style="height:200px;"></div>
                                     </div>
-                                    <div>
+                                    <br>
+                                    <div class="box graphbox">
                                         <div class="statpill-name">Network Utilisation</div>
                                         <div id="network_graph" style="height:200px;"></div>
                                     </div>
-                                    <div>
-                                        <div class="statpill-name">Instances</div>
-                                        <div id="count_graph" style="height:200px;"></div>
-                                    </div>
+                                    <br>
                                 </div>
                             </div>
                         </div>
 
-
                         <div class="col-md-4 statpill-root border-right">
-                            <h4>Instance Hosts</h4>
+                            <div class="">
+                                <div ng-repeat="server in main.servers">
+                                    <div ng-click="main.open_server(server.Id)" class="box graphbox hoverselect">
+                                        <div>Server: <span ng-bind="server.Id"></span></div>
+                                        <div>Ip Adddress: <span ng-bind="server.Ip"></span></div>
+                                        <div>State: <span ng-bind="server.State"></span></div>
+                                    </div>
+                                    <br>
 
-                            <div ng-repeat="server in main.servers">
-                                <div ng-click="main.open_server(server.Id)">
-                                    <div ng-bind="server.Id"></div>
                                 </div>
                             </div>
                         </div>
@@ -123,6 +117,8 @@
             };
 
             var get_current_servers = function () {
+                window.push_loading();
+
                 return $http.get("/ajax/servers").then(
                         function (response) {
                             self.servers = [];
@@ -140,6 +136,7 @@
                             }
 
                             self.current_servers_count = self.servers.length;
+                            window.pop_loading();
                         }, function (err) {
                             console.log("err")
                         }
@@ -147,12 +144,18 @@
             };
 
             var get_memory_usage = function () {
+                window.push_loading();
+
                 return $http.get("/ajax/application/{{ name }}/servers/memory").then(
                         function (response) {
+                            window.pop_loading();
+
                             var running_count = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                running_count.push(response.data.memory[i]["InstanceCount"]);
+                                running_count.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["InstanceCount"]]);
                             }
+
+                            console.log(running_count);
 
                             Highcharts.chart('count_graph', {
                                 chart: {
@@ -162,10 +165,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: 'datetime'
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -173,7 +177,7 @@
                                     }
                                 },
                                 series: [{
-                                    showInLegend: true,
+                                    showInLegend: false,
                                     data: running_count,
                                     marker: {
                                         enabled: false
@@ -185,10 +189,9 @@
 
                             var memory_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                memory_usage.push(response.data.memory[i]["Mbytes"]);
+                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Mbytes"]]);
                             }
 
-                            console.log(memory_usage);
                             Highcharts.chart('memory_graph', {
                                 chart: {
                                     type: 'areaspline'
@@ -197,10 +200,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: "datetime"
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -218,7 +222,7 @@
 
                             var cpu_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                cpu_usage.push(response.data.memory[i]["Cpu"]);
+                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Cpu"]]);
                             }
 
                             Highcharts.chart('cpu_graph', {
@@ -229,10 +233,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: 'datetime'
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {
@@ -250,7 +255,7 @@
 
                             var network_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                network_usage.push(response.data.memory[i]["Network"]);
+                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Network"]]);
                             }
 
                             Highcharts.chart('network_graph', {
@@ -261,10 +266,11 @@
                                 exporting: {enabled: false},
                                 credits: {enabled: false},
                                 xAxis: {
-                                    visible: false
+                                    visible: true,
+                                    type: 'datetime'
                                 },
                                 yAxis: {
-                                    visible: false
+                                    visible: true
                                 },
                                 plotOptions: {
                                     areaspline: {

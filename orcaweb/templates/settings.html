@@ -1,42 +1,16 @@
 {% extends "layout.html" %}
 {% block navigation_top %}
-    <div class="topnavtitle">Settings</div>
+    <div class="topnavtitle">General Settings</div>
 {% endblock %}
 {% block body %}
     <script>
         window.toggle_main_nav("leftnav_settings");
     </script>
-
+    <br>
     <div ng-app="Settings">
         <div ng-controller="Main as main">
             <form name="settingsForm" ng-submit="main.save()">
-                <div class="configuration_row row">
-                    <div class="col-lg-4">
-                        <div class="subtitle">Cloud Provider Settings</div>
-                        <div class="subtext">
-                            Configure general cloud provider settings.
-                        </div>
-                    </div>
-
-                    <div class="col-lg-8">
-                        <div class="form-group">
-                            <label>Type</label>
-                            <select ng-model="main.settings.Type" class="form-control">
-                                <option>AWS</option>
-                                <option>TEST</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>MinInstances</label>
-                            <input ng-model="main.settings.MinInstances" type="number" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>MaxInstances</label>
-                            <input type="number" class="form-control" ng-model="main.settings.MaxInstances">
-                        </div>
-                    </div>
-                </div>
-                <div class="configuration_row row">
+                <div class="configuration_row row box">
                     <div class="col-lg-4">
                         <div class="subtitle">Amazon Configuration</div>
                         <div class="subtext">
@@ -47,23 +21,155 @@
                     <div class="col-lg-8">
                         <div class="form-group">
                             <label>Key</label>
-                            <input type="text" class="form-control" ng-model="main.settings.AWSConfiguration.Key">
+                            <input type="text" class="form-control" ng-model="main.settings.AWSAccessKeyId">
                         </div>
                         <div class="form-group">
                             <label>Secret</label>
-                            <input type="text" class="form-control" ng-model="main.settings.AWSConfiguration.Secret">
+                            <input type="text" class="form-control" ng-model="main.settings.AWSAccessKeySecret">
                         </div>
                         <div class="form-group">
                             <label>Region</label>
-                            <input type="text" class="form-control" ng-model="main.settings.AWSConfiguration.Region">
+                            <input type="text" class="form-control" ng-model="main.settings.AWSRegion">
                         </div>
                         <div class="form-group">
-                            <label>AMI</label>
-                            <input type="text" class="form-control" ng-model="main.settings.AWSConfiguration.AMI">
+                            <label>SSH UserName</label>
+                            <input type="text" class="form-control" ng-model="main.settings.InstanceUsername">
                         </div>
                         <div class="form-group">
-                            <label>SecurityGroupId</label>
-                            <input type="text" class="form-control" ng-model="main.settings.AWSConfiguration.SecurityGroupId">
+                            <label>SSH Key Name</label>
+                            <input type="text" class="form-control" ng-model="main.settings.AWSSSHKey">
+                        </div>
+                        <div class="form-group">
+                            <label>SSH Key Absolute Path</label>
+                            <input type="text" class="form-control" ng-model="main.settings.AWSSSHKeyPath">
+                        </div>
+                        <div class="form-group">
+                            <label>Base Image AMI</label>
+                            <input type="text" class="form-control" ng-model="main.settings.AWSBaseAmi">
+                        </div>
+                        <div class="form-group">
+                            <label>Ondemand Instance Type</label>
+                            <input type="text" class="form-control" ng-model="main.settings.InstanceType">
+                        </div>
+                        <div class="form-group">
+                            <label>Spot Instance Type</label>
+                            <input type="text" class="form-control" ng-model="main.settings.SpotInstanceType">
+                        </div>
+                        <div class="form-group">
+                            <label>Spot Instance Bid</label>
+                            <input type="number" class="form-control" ng-model="main.settings.AWSSpotPrice" step="0.0001">
+                        </div>
+
+                    </div>
+                </div>
+                <br>
+                <div class="configuration_row row box">
+                    <div class="col-lg-4">
+                        <div class="subtitle">General Settings</div>
+                        <div class="subtext">
+                            Configure general settings.
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>Env  Name</label>
+                            <input type="text" class="form-control" ng-model="main.settings.EnvName">
+                        </div>
+                        <div class="form-group">
+                            <label>Trainer API Port</label>
+                            <input type="number" class="form-control" ng-model="main.settings.ApiPort">
+                        </div>
+                        <div class="form-group">
+                            <label>Trainer API Uri</label>
+                            <input type="text" class="form-control" ng-model="main.settings.Uri">
+                        </div>
+                        <div class="form-group">
+                            <label>Trainer Logger Port</label>
+                            <input type="number" class="form-control" ng-model="main.settings.LoggingPort">
+                        </div>
+                        <div class="form-group">
+                            <label>Trainer Logger Uri</label>
+                            <input type="text" class="form-control" ng-model="main.settings.LoggingUri">
+                        </div>
+                        <div class="form-group">
+                            <label>Host Authentication Token</label>
+                            <input type="text" class="form-control" ng-model="main.settings.HostToken">
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="configuration_row row box">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Timeout Settings</div>
+                        <div class="subtext">
+                            Configure timeouts.
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>App Change Timeout</label>
+                            <input type="number" class="form-control" ng-model="main.settings.AppChangeTimeout">
+                        </div>
+                        <div class="form-group">
+                            <label>Server Deploy/Terminate Timeout</label>
+                            <input type="number" class="form-control" ng-model="main.settings.ServerChangeTimeout">
+                        </div>
+                        <div class="form-group">
+                            <label>Server Checkin Timeout</label>
+                            <input type="number" class="form-control" ng-model="main.settings.ServerTimeout">
+                        </div>
+                        <div class="form-group">
+                            <label>Server App Change Failure Limit</label>
+                            <input type="number" class="form-control" ng-model="main.settings.HostChangeFailureLimit">
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="configuration_row row box">
+                    <div class="col-lg-4">
+                        <div class="subtitle">API Access Tokens</div>
+                        <div class="subtext">
+                            Configure api access tokens that can be used for programatic api access without authentication.
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>Access Token</label>
+                            <div class="form-group form-inline" ng-repeat="mapping in main.settings.ApiTokens">
+                                <input type="text" class="form-control" ng-model="mapping.Token" placeholder="Token Key">
+                                <a ng-click="main.delete_token(mapping.Token)"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
+                            </div>
+                            <a ng-click="main.create_token()">Add Token</a>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="configuration_row row box">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Audit Webhooks</div>
+                        <div class="subtext">
+                            Push auditing events to a http post webhook like slack.
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>Endpoints</label>
+                            <div class="form-group form-inline" ng-repeat="mapping in main.settings.AuditWebhooks">
+                                <input type="text" class="form-control" ng-model="mapping.Uri" placeholder="Url">
+                                <select ng-model="mapping.Severity">
+                                    <option value="info">info</option>
+                                    <option value="error">error</option>
+                                    <option value="debug">debug</option>
+                                </select>
+                                <a ng-click="main.delete_webhook(mapping.Uri)"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
+                            </div>
+                            <a ng-click="main.create_webhook()">Add Webhook</a>
                         </div>
                     </div>
                 </div>
@@ -90,7 +196,47 @@
                         $http.post("/ajax/settings", self.settings).then(function(response){
                             get_settings();
                         });
-                    }
+                    };
+
+                    self.create_token = function () {
+                        if (!self.settings.ApiTokens) {
+                            self.settings.ApiTokens = []
+                        }
+                        self.settings.ApiTokens.push({
+                            "Token": ""
+                        })
+                    };
+                    self.delete_token = function (token) {
+                        var new_items = [];
+                        for (var i = 0; i < self.settings.ApiTokens.length; i++) {
+                            if (!(self.settings.ApiTokens[i]["Token"] == token)) {
+                                new_items.push(self.settings.ApiTokens[i]);
+                            }
+                        }
+
+                        self.settings.ApiTokens = new_items;
+                    };
+
+                    self.create_webhook = function () {
+                        if (!self.settings.AuditWebhooks) {
+                            self.settings.AuditWebhooks = []
+                        }
+                        self.settings.AuditWebhooks.push({
+                            "Uri": "",
+                            "Severity": "error"
+                        })
+                    };
+                    self.delete_webhook = function (url) {
+                        var new_items = [];
+                        for (var i = 0; i < self.settings.AuditWebhooks.length; i++) {
+                            if (!(self.settings.AuditWebhooks[i]["Uri"] == url)) {
+                                new_items.push(self.settings.AuditWebhooks[i]);
+                            }
+                        }
+
+                        self.settings.AuditWebhooks = new_items;
+                    };
+
                 }]);
         </script>
         </div>

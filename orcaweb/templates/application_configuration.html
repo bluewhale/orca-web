@@ -33,74 +33,79 @@
             </script>
         </div>
     </div>
+                    <br>
+
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <div ng-app="ApplicationSettings" class="row">
         <div ng-controller="Main as main">
             <form ng-submit="main.save()">
-                <div class="row configuration_row">
+                <div class="row configuration_row box formbox">
                     <div class="col-lg-4">
-                        <div class="subtitle">Affinity Tags</div>
+                        <div class="subtitle">Grouping Tag</div>
                         <div class="subtext">
-                            Affinity tags provide a mechanism for grouping applications together on hosts.
+                            Grouping tags provide a mechanism for grouping applications together on hosts.
                         </div>
                     </div>
                     <div class="col-lg-8">
 
                         <div class="form-group">
                             <label>Tags</label>
-                            <div class="form-group form-inline" ng-repeat="mapping in main.application.Affinity">
-                                <input type="text" class="form-control" ng-model="mapping.Tag" placeholder="Affinity">
-                                <a ng-click="main.delete_affinitytag(mapping.Tag)"><i
-                                        class="glyphicon glyphicon-remove"></i></a>
+                            <div class="form-group form-inline">
+                                <input type="text" class="form-control" ng-model="main.application.GroupingTag"
+                                       placeholder="Affinity">
                             </div>
-                            <a ng-click="main.create_affinitytag()">Add Tag</a>
                         </div>
                     </div>
                 </div>
+                <br>
 
+                <div class="row configuration_row box formbox">
+                    <div class="">
+                        <div class="col-lg-4">
+                            <div class="subtitle">Docker Configuration</div>
+                            <div class="subtext">
+                                Configure the docker container, repository, version and other details.
+                            </div>
+                        </div>
+                        <div class="col-lg-8">
+                            <div class="form-group">
+                                <label>Docker Repository</label>
+                                <input type="text" class="form-control"
+                                       ng-model="main.application.DockerConfig.Repository">
+                            </div>
+                            <div class="form-group">
+                                <label>Docker Tag</label>
+                                <input type="text" class="form-control" ng-model="main.application.DockerConfig.Tag">
+                            </div>
+                            <div class="form-group">
+                                <label>Docker Reference</label>
+                                <input type="text" class="form-control"
+                                       ng-model="main.application.DockerConfig.Reference">
+                            </div>
 
-                <div class="row configuration_row">
-                    <div class="col-lg-4">
-                        <div class="subtitle">Docker Configuration</div>
-                        <div class="subtext">
-                            Configure the docker container, repository, version and other details.
-                        </div>
-                    </div>
-                    <div class="col-lg-8">
-
-                        <div class="form-group">
-                            <label>Docker Repository</label>
-                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Repository">
-                        </div>
-                        <div class="form-group">
-                            <label>Docker Tag</label>
-                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Tag">
-                        </div>
-                        <div class="form-group">
-                            <label>Docker Reference</label>
-                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Reference">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Docker Username</label>
-                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Username">
-                        </div>
-                        <div class="form-group">
-                            <label>Docker Email</label>
-                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Email">
-                        </div>
-                        <div class="form-group">
-                            <label>Docker Password</label>
-                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Password">
-                        </div>
-                        <div class="form-group">
-                            <label>Docker Server</label>
-                            <input type="text" class="form-control" ng-model="main.application.DockerConfig.Server">
+                            <div class="form-group">
+                                <label>Docker Username</label>
+                                <input type="text" class="form-control"
+                                       ng-model="main.application.DockerConfig.Username">
+                            </div>
+                            <div class="form-group">
+                                <label>Docker Email</label>
+                                <input type="text" class="form-control" ng-model="main.application.DockerConfig.Email">
+                            </div>
+                            <div class="form-group">
+                                <label>Docker Password</label>
+                                <input type="text" class="form-control"
+                                       ng-model="main.application.DockerConfig.Password">
+                            </div>
+                            <div class="form-group">
+                                <label>Docker Server</label>
+                                <input type="text" class="form-control" ng-model="main.application.DockerConfig.Server">
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="configuration_row row">
+                <br>
+                <div class="configuration_row row box formbox">
                     <div class="col-lg-4">
                         <div class="subtitle">Network Configuration</div>
                         <div class="subtext">
@@ -133,8 +138,8 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="configuration_row row">
+                <br>
+                <div class="configuration_row row box formbox">
                     <div class="col-lg-4">
                         <div class="subtitle">Application Health Checks</div>
                         <div class="subtext">
@@ -159,8 +164,8 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="configuration_row row">
+                <br>
+                <div class="configuration_row row box formbox">
                     <div class="col-lg-4">
                         <div class="subtitle">Port Mappings</div>
                         <div class="subtext">
@@ -179,8 +184,8 @@
                         <a ng-click="main.create_port_mapping()">Add Mapping</a>
                     </div>
                 </div>
-
-                <div class="configuration_row row">
+                <br>
+                <div class="configuration_row row box formbox">
                     <div class="col-lg-4">
                         <div class="subtitle">Volumes</div>
                         <div class="subtext">
@@ -200,7 +205,8 @@
                         <a ng-click="main.create_volume()">Add Volume</a>
                     </div>
                 </div>
-                <div class="configuration_row row">
+                <br>
+                <div class="configuration_row row box formbox">
                     <div class="col-lg-4">
                         <div class="subtitle">Environment Variables</div>
                         <div class="subtext">
@@ -220,7 +226,8 @@
                     </div>
                 </div>
 
-                <div class="configuration_row row">
+                <br>
+                <div class="configuration_row row box formbox">
                     <div class="col-lg-4">
                         <div class="subtitle">Files</div>
                         <div class="subtext">
@@ -406,25 +413,6 @@
                 }
 
                 self.application.Checks = new_items;
-            };
-
-            self.create_affinitytag = function () {
-                if (!self.application.Affinity) {
-                    self.application.Affinity = []
-                }
-                self.application.Affinity.push({
-                    "Tag": ""
-                })
-            };
-            self.delete_affinitytag = function (tag) {
-                var new_items = [];
-                for (var i = 0; i < self.application.Affinity.length; i++) {
-                    if (!(self.application.Affinity[i]["Tag"] == tag)) {
-                        new_items.push(self.application.Affinity[i]);
-                    }
-                }
-
-                self.application.Affinity = new_items;
             };
         }]);
 

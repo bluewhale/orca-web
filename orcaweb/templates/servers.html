@@ -10,44 +10,193 @@
                 window.toggle_main_nav("leftnav_servermap");
             </script>
 
+            <style>
+                .selected {
+                    background-color: whitesmoke;
+                }
+            </style>
             <br>
-            <table class="table table-bordered">
-                <thead>
-                <th>HostID</th>
-                <th>State</th>
-                <th>Spot Instance</th>
-                <th>Applications</th>
-                </thead>
+            <div class="row">
+                <div class="col-md-2">
+                    <div id="appNav">
+                        <div id="nav__all_instances" class="appNavItem" ng-click="main.show__all_applications()"><i
+                                class="fa fa-th icon-fixed-width" aria-hidden="true"></i> All
+                            Instances
+                        </div>
+                        <div id="nav__all_running" ng-click="main.show__all_running()" class="appNavItem">
+                            <i class="fa fa-check icon-fixed-width" aria-hidden="true"></i> Running
+                        </div>
+                        <div id="nav__all_initializing" ng-click="main.show__all_initializing()" class="appNavItem">
+                            <i class="fa fa-circle-o-notch icon-fixed-width" aria-hidden="true"></i> Initializing
 
-                <tbody>
-                {% raw %}
-                    <tr ng-repeat="server in main.servers">
-                        <td><a href="/server/{{ server.Id }}/overview" ng-bind="server.Id"></a></td>
-                        <td><span ng-bind="server.State"></span></td>
-                        <td><span ng-bind="server.SpotInstance"></span></td>
-                        <td>
-                            <span class="badge" ng-bind="application.Name" ng-repeat="application in server.Apps"></span>
-                        </td>
-                    </tr>
-                {% endraw %}
-                </tbody>
-            </table>
+                            <span ng-show="main.initializing > 0" class="badge" ng-bind="main.initializing"></span>
+                        </div>
+                        <div id="nav__all_deploying" ng-click="main.show__all_deploying()" class="appNavItem">
+                            <i class="fa fa-random icon-fixed-width" aria-hidden="true"></i> Deploying Apps
+                            <span ng-show="main.deploying > 0" class="badge" ng-bind="main.deploying"></span>
+                        </div>
+
+                        <br>
+                        <div id="nav__all_ondemand" class="appNavItem" ng-click="main.show__all_ondemand()">
+                            <i class="fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Ondemand
+                            Instances
+                        </div>
+                        <div id="nav__all_spotinstances" class="appNavItem" ng-click="main.show__all_spot()">
+                            <i class="fa fa fa-usd icon-fixed-width" aria-hidden="true"></i> Spot Instances
+                        </div>
+
+                        <br><br>
+                        <div ng-repeat="(key, value) in main.networks">
+                            <div class="appNavItem"><i class="fa fa-rocket icon-fixed-width"
+                                                       aria-hidden="true"></i><span ng-bind="key"></span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <style>
+                    .whitetable {
+                        background-color: white;
+                    }
+
+                    #appBody {
+                    }
+                </style>
+                <div class="col-md-10" id="appBody">
+                    <div class="">
+                        <div class="statpill-name">Server Instances</div>
+                        <table class="table">
+                            <tbody>
+                            {% raw %}
+                            <tr ng-repeat="server in main.servers">
+                                <td style="white-space: nowrap"><i class="fa fa-server"></i> <a
+                                        href="/server/{{ server.Id }}/overview" ng-bind="server.Id"></a></td>
+                                <td>
+                                    <span ng-bind="server.State"></span>
+                                </td>
+                                <td><span ng-bind="server.Ip"></span></td>
+                                <td><span ng-bind="server.Network"></span></td>
+                                <td>
+                                    <span ng-show="server.SpotInstance">Spot</span>
+                                    <span ng-show="!server.SpotInstance">OnDemand</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <div ng-show="main.servers_empty"><i>No Instances Found</i></div>
+                            </tr>
+                            {% endraw %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <script>
                 angular.module("ApplicationsDashboard", []).controller("Main", ["$http", function ($http) {
                     var self = this;
                     self.servers = [];
+                    self.servers_empty = false;
+                    self.initializing = 0;
+                    self.deploying = 0;
 
-                    var get_servers = function(){
+                    var get_servers = function (filter_method) {
+                        window.push_loading();
+
+                        self.servers = [];
+                        self.initializing = 0;
+                        self.deploying = 0;
+                        self.servers_empty = false;
                         return $http.get("/ajax/servers").then(
-                                function(response){
-                                    self.servers = response.data["servers"]
-                                }, function(err){
+                                function (response) {
+                                    window.pop_loading();
+
+                                    for (var i = 0; i < response.data["servers"].length; i++) {
+                                        var server = response.data["servers"][i];
+                                        if (server["Changes"].length > 0) {
+                                            server["State"] = "deploying applications";
+
+                                            self.deploying += 1;
+                                        }
+
+                                        if (server["State"] == "initializing") {
+                                            self.initializing += 1;
+                                        }
+
+                                        if (filter_method == undefined) {
+                                            self.servers.push(server);
+                                        } else {
+                                            if (filter_method(server)) {
+                                                self.servers.push(server);
+                                            }
+                                        }
+                                    }
+
+                                    self.servers_empty = self.servers.length == 0;
+                                }, function (err) {
                                     console.log("err")
                                 }
                         )
                     };
-                    get_servers();
+
+                    self.show__all_applications = function () {
+                        $(".appNavItem").removeClass("selected");
+                        $("#nav__all_instances").addClass("selected");
+                        get_servers()
+
+                    };
+
+                    self.show__all_ondemand = function () {
+                        $(".appNavItem").removeClass("selected");
+                        $("#nav__all_ondemand").addClass("selected");
+
+                        get_servers(function (input) {
+                            if (!input["SpotInstance"]) {
+                                return true;
+                            }
+                        });
+                    };
+
+                    self.show__all_running = function () {
+                        $(".appNavItem").removeClass("selected");
+                        $("#nav__all_running").addClass("selected");
+
+                        get_servers(function (input) {
+                            if (input["State"] == "running") {
+                                return true;
+                            }
+                        });
+                    };
+                    self.show__all_initializing = function () {
+                        $(".appNavItem").removeClass("selected");
+                        $("#nav__all_initializing").addClass("selected");
+
+                        get_servers(function (input) {
+                            if (input["State"] == "initializing") {
+                                return true;
+                            }
+                        });
+                    };
+                    self.show__all_deploying = function () {
+                        $(".appNavItem").removeClass("selected");
+                        $("#nav__all_deploying").addClass("selected");
+
+                        get_servers(function (input) {
+                            if (input["State"] == "deploying applications") {
+                                return true;
+                            }
+                        });
+                    };
+                    self.show__all_spot = function () {
+                        $(".appNavItem").removeClass("selected");
+                        $("#nav__all_spotinstances").addClass("selected");
+
+                        get_servers(function (input) {
+                            if (input["SpotInstance"]) {
+                                return true;
+                            }
+                        });
+                    };
+
+                    self.show__all_applications();
                 }]);
             </script>
         </div>

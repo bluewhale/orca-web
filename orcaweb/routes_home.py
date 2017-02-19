@@ -28,35 +28,36 @@ def route_servers():
 def route_applications_get():
     return flask.jsonify(applications=api__trainer.get__configuration__applications())
 
+
 @app.route("/ajax/applications/by/vpc")
 @login_required
 def route_applications_get__by_vpc():
-    ret = {}
+    ret = []
     servers = api__trainer.get__status__servers()
     applications = api__trainer.get__configuration__applications()
     for app in applications:
         app["Running"] = 0
         app["Failed"] = 0
 
-        configurations = list(app.get("Config", []).values())
-        if configurations:
-            appConfiguration = configurations[-1]
-            if appConfiguration["Network"] not in ret:
-                ret[appConfiguration["Network"]] = []
+        for key, server in servers.iteritems():
+            if server.get("Apps"):
+                for serverAppState in server.get("Apps", []):
+                    if serverAppState["Name"] == app["Name"]:
+                        if serverAppState["State"] == "running":
+                            app["Running"] += 1
+                        else:
+                            app["Failed"] += 1
 
-            for key, server in servers.iteritems():
-                if server.get("Apps"):
-                    for serverAppState in server.get("Apps", []):
-                        if serverAppState["Name"] == app["Name"]:
-                            if serverAppState["State"] == "running":
-                                app["Running"] += 1
-                            else:
-                                app["Failed"] += 1
-            ret[appConfiguration["Network"]].append(app)
+        if app["Enabled"]:
+            if app["Running"] == app["DesiredDeployment"]:
+                app["Status"] = "Ok"
+
+            if app["Running"] != app["DesiredDeployment"]:
+                app["Status"] = "Scaling"
         else:
-            if "unknown" not in ret:
-                ret["unknown"] = []
-            ret["unknown"].append(app)
+            app["Status"] = "Disabled"
+        ret.append(app)
+
     return flask.jsonify(applications=ret)
 
 
@@ -69,13 +70,13 @@ def route_audit():
 @app.route("/settings")
 @login_required
 def route_settings():
-    return render_template("settings.html", cloud=api__trainer.get__configuration__cloud())
+    return render_template("settings.html")
 
 
 @app.route("/ajax/settings", methods=["GET"])
 @login_required
 def ajax__route_settings():
-    return flask.jsonify(api__trainer.get__configuration__cloud())
+    return flask.jsonify(api__trainer.get__settings())
 
 
 @app.route("/ajax/servers", methods=["GET"])
@@ -91,7 +92,7 @@ def ajax__route_servers():
 @app.route("/ajax/settings", methods=["POST"])
 @login_required
 def ajax__route_settings_post():
-    api__trainer.set__configuration__cloud(request.json)
+    api__trainer.set__settings(request.json)
     return ""
 
 
@@ -110,7 +111,7 @@ def ajax__route_application_configuration(name):
 @app.route("/ajax/server/<name>/logs", methods=["GET"])
 @login_required
 def ajax__route_server_logs(name):
-    return flask.jsonify(logs=api__trainer.get__status__server_logs(name))
+    return flask.jsonify(logs=api__trainer.get__status__server_logs(name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
 
 
 @app.route("/ajax/server/<name>", methods=["GET"])
@@ -142,22 +143,6 @@ def ajax__route_application_post_configuration(name):
 @app.route("/settings", methods=["POST"])
 @login_required
 def route_settings_save():
-    cloud_provider_configuration = {
-        "Type": request.form.get("Type"),
-        "MinInstances": int(request.form.get("MinInstances")),
-        "MaxInstances": int(request.form.get("MaxInstances"))
-    }
-
-    if cloud_provider_configuration["Type"] == "AWS":
-        cloud_provider_configuration["AWSConfiguration"] = {
-            "Key": request.form.get("Key"),
-            "Secret": request.form.get("Secret"),
-            "Region": request.form.get("Region"),
-            "AMI": request.form.get("AMI"),
-            "SecurityGroupId": request.form.get("SecurityGroupId")
-        }
-
-    api__trainer.set__configuration__cloud(cloud_provider_configuration)
     return redirect("/settings")
 
 
@@ -188,7 +173,7 @@ def route_application_logs(name):
 @app.route("/ajax/events", methods=["GET"])
 @login_required
 def route_events():
-    return flask.jsonify(events=api__trainer.get__audit())
+    return flask.jsonify(events=api__trainer.get__audit(search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
 
 
 @app.route("/application/<name>/server/<serverid>", methods=["GET"])
@@ -242,13 +227,14 @@ def ajax__route_application_count(name):
 @app.route("/ajax/application/<name>/events", methods=["GET"])
 @login_required
 def ajax__route_application_events(name):
-    return flask.jsonify(events=api__trainer.get__status__application_events(name))
+    return flask.jsonify(events=api__trainer.get__status__application_events(name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
 
 
 @app.route("/ajax/server/<name>/events", methods=["GET"])
 @login_required
 def ajax__route_server_events(name):
-    return flask.jsonify(events=api__trainer.get__status__server_audit(name))
+    return flask.jsonify(events=api__trainer.get__status__server_audit(name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
+
 
 @app.route("/ajax/server/<name>/memory", methods=["GET"])
 @login_required
@@ -256,10 +242,16 @@ def ajax__route_server_memory(name):
     return flask.jsonify(memory=api__trainer.get__status__server_memory(name))
 
 
+@app.route("/ajax/application/<application>/servers/<server>/memory", methods=["GET"])
+@login_required
+def ajax__route_application_server_memory(application, server):
+    return flask.jsonify(memory=api__trainer.get__status__application_server_memory(server, application))
+
+
 @app.route("/ajax/application/<name>/logs", methods=["GET"])
 @login_required
 def ajax__route_application_logs(name):
-    return flask.jsonify(logs=api__trainer.get__status__application_logs(name))
+    return flask.jsonify(logs=api__trainer.get__status__application_logs(name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
 
 
 def extract_command(string_command):
