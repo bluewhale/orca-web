@@ -141,11 +141,7 @@
         text-decoration: none;
     }
 
-    .navitem:hover {
-        background: #5C4E90 !important;
-    }
-
-    .topnavtitle {
+        .topnavtitle {
         display: inline;
     }
 
@@ -221,6 +217,15 @@
 
     .navitem {
         display: inline;
+        padding-right: 11px;
+    }
+
+    .navitem_selected {
+        text-decoration: underline;
+    }
+
+    .navitem:hover {
+        text-decoration: underline;
     }
 
     .navitem a {
@@ -324,13 +329,13 @@
 <div id="topnav">
     <div class="orcatitle">orca</div>
     <div class="leftnavitem">
-        <div class="navitem"><a href="/">Apps</a></div>
-        <div class="navitem"><a href="/servers">Servers</a></div>
-        <div class="navitem"><a href="/audit">Events</a></div>
+        <div id="navitem_apps" class="navitem"><a href="/">Apps</a></div>
+        <div id="navitem_servers" class="navitem"><a href="/servers">Servers</a></div>
+        <div id="navitem_events" class="navitem"><a href="/audit">Events</a></div>
     </div>
     <div class="rightnavitem">
-        <div class="navitem"><a href="/settings">Settings</a></div>
-        <div class="navitem"><a href=""><i class="fa fa-sign-out" aria-hidden="true"></i></a></div>
+        <div id="navitem_settings" class="navitem"><a href="/settings">Settings</a></div>
+        <div class="navitem"><a href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i></a></div>
     </div>
 </div>
 

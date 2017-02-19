@@ -2,7 +2,6 @@ from flask.app import Flask
 from flask.ext.login import LoginManager
 
 app = Flask(__name__)
-app.config.from_envvar('APP_CONFIG_FILE')
 app.secret_key = "secret"
 
 login_manager = LoginManager()

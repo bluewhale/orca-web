@@ -3,6 +3,10 @@
     <div class="topnavtitle">Server Map</div>
 {% endblock %}
 {% block body %}
+    <script>
+        $("#navitem_servers").addClass("navitem_selected");
+    </script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <div ng-app="ApplicationsDashboard">
         <div ng-controller="Main as main">
