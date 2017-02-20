@@ -3,9 +3,9 @@
     <span class="topnavtitle">Application Overview</span>
 {% endblock %}
 {% block body %}
-<script>
-    $("#navitem_apps").addClass("navitem_selected");
-</script>
+    <script>
+        $("#navitem_apps").addClass("navitem_selected");
+    </script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
     <div ng-app="ApplicationsDashboard">
@@ -36,10 +36,12 @@
 
                         </div>
                         <div id="nav__deploying" ng-click="main.show__scaling()" class="appNavItem">
-                            <i class="fa fa fa-line-chart icon-fixed-width" aria-hidden="true"></i> Scaling <span ng-show="main.scaling_count > 0" class="badge" ng-bind="main.scaling_count"></span>
+                            <i class="fa fa fa-line-chart icon-fixed-width" aria-hidden="true"></i> Scaling <span
+                                ng-show="main.scaling_count > 0" class="badge" ng-bind="main.scaling_count"></span>
                         </div>
                         <div id="nav__offline" ng-click="main.show__offline_and_warnings()" class="appNavItem">
-                            <i class="fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Offline  <span ng-show="main.offline_count > 0" class="badge" ng-bind="main.offline_count"></span>
+                            <i class="fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Offline <span
+                                ng-show="main.offline_count > 0" class="badge" ng-bind="main.offline_count"></span>
                         </div>
 
                         <br><br>
@@ -50,6 +52,11 @@
                                     ng-bind="key"></span></div>
                         </div>
                         {% endraw %}
+
+                        <br>
+                        <div id="nav__offline" onclick="window.open_add_application()" class="appNavItem">
+                            <i class="fa fa fa-plus-square icon-fixed-width" aria-hidden="true"></i> Add Application
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-10" id="appBody">
@@ -157,34 +164,33 @@
                     </div>
                 </div>
             </div>
-        </DIV>
-        <div id="addappmodal" class="modal fade" tabindex="-1" role="dialog">
-            <form name="add" ng-submit="main.add_application()">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                    aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">Create New Application</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <label>Application Name</label>
-                                <input type="text" class="form-control" ng-model="main.newApplication.Name">
+            <div id="addappmodal" class="modal fade" tabindex="-1" role="dialog">
+                <form name="add" ng-submit="main.add_application()">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">Create New Application</h4>
                             </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label>Application Name</label>
+                                    <input type="text" class="form-control" ng-model="main.newApplication.Name">
+                                </div>
 
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">
-                                Save
-                            </button>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">
+                                    Save
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </div>
-
+                </form>
+            </div>
+        </DIV>
         <br>
         <script>
             angular.module("ApplicationsDashboard", []).controller("Main", ["$http", function ($http) {
@@ -225,7 +231,7 @@
                                 }
 
                                 for (var i = 0; i < self.applications.length; i++) {
-                                    if(self.applications[i]["Running"] == 0){
+                                    if (self.applications[i]["Running"] == 0) {
                                         self.offline_count += 1;
                                     }
                                     if (self.applications[i]["Running"] != self.applications[i]["DesiredDeployment"]) {
@@ -295,7 +301,7 @@
                         get_applications();
                         $("#addappmodal").modal("hide");
                     });
-                }
+                };
 
                 self.show__all_applications();
             }]);
