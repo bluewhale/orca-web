@@ -152,7 +152,7 @@
 
                             var running_count = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                running_count.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["InstanceCount"]]);
+                                running_count.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["InstanceCount"]]);
                             }
 
                             console.log(running_count);
@@ -189,7 +189,7 @@
 
                             var memory_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Mbytes"]]);
+                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Mbytes"]]);
                             }
 
                             Highcharts.chart('memory_graph', {
@@ -222,7 +222,7 @@
 
                             var cpu_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Cpu"]]);
+                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Cpu"]]);
                             }
 
                             Highcharts.chart('cpu_graph', {
@@ -255,7 +255,7 @@
 
                             var network_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Network"]]);
+                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Network"]]);
                             }
 
                             Highcharts.chart('network_graph', {
