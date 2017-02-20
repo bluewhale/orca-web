@@ -146,22 +146,22 @@
 
                             var cpu_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Cpu"]]);
+                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Cpu"]]);
                             }
 
                             var memory_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Mbytes"]]);
+                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Mbytes"]]);
                             }
 
                             var network_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Network"]]);
+                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Network"]]);
                             }
 
                             var hdd_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                hdd_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["HardDiskUsagePercent"]]);
+                                hdd_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["HardDiskUsagePercent"]]);
                             }
 
                             Highcharts.chart('cpu_graph', {
