@@ -19,7 +19,6 @@
                     background-color: whitesmoke;
                 }
             </style>
-            <br>
             <div class="row">
                 <div class="col-md-2">
                     <div id="appNav">
@@ -63,6 +62,7 @@
                     }
 
                     #appBody {
+                        padding-top:15px;
                     }
                 </style>
                 <div class="col-md-10" id="appBody">
@@ -115,7 +115,7 @@
 
                                     for (var i = 0; i < response.data["servers"].length; i++) {
                                         var server = response.data["servers"][i];
-                                        if (server["Changes"].length > 0) {
+                                        if ("Changes" in server && server["Changes"] != undefined && server["Changes"].length > 0) {
                                             server["State"] = "deploying applications";
 
                                             self.deploying += 1;
