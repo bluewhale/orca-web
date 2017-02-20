@@ -52,6 +52,14 @@
                                     ng-bind="key"></span></div>
                         </div>
                         {% endraw %}
+                        <br><br>
+                        {% raw %}
+                        <div ng-repeat="(key, value) in main.affinitytags">
+                            <div id="nav__affinitytags_{{ key }}" ng-click="main.show_affinitytags(key)" class="appNavItem"><i
+                                    class="fa fa-object-group icon-fixed-width" aria-hidden="true"></i><span
+                                    ng-bind="key"></span></div>
+                        </div>
+                        {% endraw %}
 
                         <br>
                         <div id="nav__offline" onclick="window.open_add_application()" class="appNavItem">
@@ -199,6 +207,7 @@
                 self.applications = [];
                 self.groupedApplications = [];
                 self.networks = {};
+                self.affinitytags = {};
                 self.scaling_count = 0;
                 self.offline_count = 0;
 
@@ -226,7 +235,11 @@
 
                                 for (var i = 0; i < self.applications.length; i++) {
                                     $.each(self.applications[i]["Config"], function (key, value) {
-                                        self.networks[value["Network"]] = true
+                                        self.networks[value["Network"]] = true;
+
+                                        if (value["GroupingTag"].length > 0) {
+                                            self.affinitytags[value["GroupingTag"]] = true
+                                        }
                                     });
                                 }
 
@@ -287,6 +300,22 @@
                     get_applications(function (item) {
                         for (var key in item["Config"]) {
                             if (item["Config"][key]["Network"] == network) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+                };
+
+
+                self.show_affinitytags = function (network) {
+                    $(".appNavItem").removeClass("selected");
+                    $("#nav__affinitytags_" + network).addClass("selected");
+
+                    get_applications(function (item) {
+                        for (var key in item["Config"]) {
+                            if (item["Config"][key]["GroupingTag"] == network) {
                                 return true;
                             }
                         }

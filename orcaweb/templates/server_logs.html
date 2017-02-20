@@ -107,17 +107,18 @@
             self.search_expression = "";
             self.limit = "100";
             self.empty = false;
+            self.logs = []
 
             var get_events = function () {
                 window.push_loading();
-
+                self.logs = [];
                 return $http.get("/ajax/server/{{ name }}/logs?search=" + self.search_expression + "&limit=" + self.limit).then(
                         function (response) {
                             window.pop_loading();
-                            self.logs = response.data.logs;
-                            for (var i = self.logs.length - 1; i >= 0; i--) {
-                                var event = self.logs[i];
-                                event["Timestamp"] = moment.parseZone(event["Timestamp"]).toDate();
+                            var logs = response.data.logs;
+                            for (var i = logs.length - 1; i >= 0; i--) {
+                                logs[i]["Timestamp"] = moment.parseZone(logs[i]["Timestamp"]).toDate();
+                                self.logs.push(logs[i]);
                             }
 
                             self.empty = self.logs.length == 0;
