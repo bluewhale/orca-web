@@ -110,7 +110,8 @@ def ajax__route_application_configuration(name):
 @app.route("/ajax/server/<name>/logs", methods=["GET"])
 @login_required
 def ajax__route_server_logs(name):
-    return flask.jsonify(logs=api__trainer.get__status__server_logs(name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
+    return flask.jsonify(logs=api__trainer.get__status__server_logs(
+        name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
 
 
 @app.route("/ajax/server/<name>", methods=["GET"])
@@ -189,7 +190,8 @@ def route_application_logs(name):
 @app.route("/ajax/events", methods=["GET"])
 @login_required
 def route_events():
-    return flask.jsonify(events=api__trainer.get__audit(search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
+    return flask.jsonify(
+        events=api__trainer.get__audit(search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
 
 
 @app.route("/application/<name>/server/<serverid>", methods=["GET"])
@@ -243,13 +245,16 @@ def ajax__route_application_count(name):
 @app.route("/ajax/application/<name>/events", methods=["GET"])
 @login_required
 def ajax__route_application_events(name):
-    return flask.jsonify(events=api__trainer.get__status__application_events(name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
+    return flask.jsonify(
+        events=api__trainer.get__status__application_events(name, search=flask.request.args.get("search"),
+                                                            limit=flask.request.args.get("limit")))
 
 
 @app.route("/ajax/server/<name>/events", methods=["GET"])
 @login_required
 def ajax__route_server_events(name):
-    return flask.jsonify(events=api__trainer.get__status__server_audit(name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
+    return flask.jsonify(events=api__trainer.get__status__server_audit(name, search=flask.request.args.get("search"),
+                                                                       limit=flask.request.args.get("limit")))
 
 
 @app.route("/ajax/server/<name>/memory", methods=["GET"])
@@ -267,7 +272,8 @@ def ajax__route_application_server_memory(application, server):
 @app.route("/ajax/application/<name>/logs", methods=["GET"])
 @login_required
 def ajax__route_application_logs(name):
-    return flask.jsonify(logs=api__trainer.get__status__application_logs(name, search=flask.request.args.get("search"), limit=flask.request.args.get("limit")))
+    return flask.jsonify(logs=api__trainer.get__status__application_logs(name, search=flask.request.args.get("search"),
+                                                                         limit=flask.request.args.get("limit")))
 
 
 def extract_command(string_command):
@@ -343,3 +349,40 @@ def route_application__set_configuration(name):
 
     api__trainer.set__configuration__applications_app__config(name, existing_configuration)
     return flask.redirect("/application/" + name)
+
+
+@app.route("/properties")
+@login_required
+def route_properties():
+    return render_template("properties.html")
+
+
+@app.route("/properties/<name>")
+@login_required
+def route_properties_name(name):
+    return render_template("properties_edit.html", name=name)
+
+
+@app.route("/ajax/properties", methods=["POST"])
+@login_required
+def ajax__route_properties_post():
+    api__trainer.set__properties(request.json)
+    return ""
+
+
+@app.route("/ajax/properties/<name>", methods=["POST"])
+@login_required
+def ajax__route_properties_post_name(name):
+    api__trainer.set__properties(request.json)
+    return ""
+
+@app.route("/ajax/properties/<name>", methods=["GET"])
+@login_required
+def ajax__route_properties_get_post(name):
+    return flask.jsonify(properties=api__trainer.get__properties_by_name(name))
+
+
+@app.route("/ajax/properties", methods=["GET"])
+@login_required
+def ajax__route_properties_get():
+    return flask.jsonify(properties=api__trainer.get__properties())

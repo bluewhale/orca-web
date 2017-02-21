@@ -1,0 +1,104 @@
+{% extends "layout.html" %}
+{% block navigation_top %}
+    <span class="topnavtitle">Property Groups</span>
+{% endblock %}
+{% block body %}
+    <script>
+        $("#navitem_apps").addClass("navitem_properties");
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+    <div ng-app="Properties">
+        <div ng-controller="Main as main">
+            <script>
+                window.toggle_main_nav("leftnav_applications");
+                window.open_add_application = function () {
+                    $("#addappmodal").modal("show");
+                };
+            </script>
+
+
+            <div class="col-md-2">
+                <div id="appNav">
+                    <div id="nav__offline" onclick="window.open_add_application()" class="appNavItem">
+                        <i class="fa fa fa-plus-square icon-fixed-width" aria-hidden="true"></i> Add Property Group
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-10" id="appBody">
+                <span class="row">
+                        <ul class="list-group">
+                            <li class="list-group-item" ng-repeat="propertyGroup in main.Properties">
+                                <a ng-click="main.open_property(propertyGroup.Name)"><span
+                                        ng-bind="propertyGroup.Name"></span></a>
+                            </li>
+                        </ul>
+                    </span>
+            </div>
+        </div>
+        <div id="addappmodal" class="modal fade" tabindex="-1" role="dialog">
+            <form name="add" ng-submit="main.add_property()">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Create New Property Group</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Property Group Name</label>
+                                <input type="text" class="form-control" ng-model="main.newPropertyGroup.Name">
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <br>
+    <script>
+        angular.module("Properties", []).controller("Main", ["$http", function ($http) {
+            var self = this;
+            self.newPropertyGroup = {};
+            self.Properties = [];
+
+            var get_props = function (filter_method) {
+                window.push_loading();
+
+                return $http.get("/ajax/properties").then(
+                        function (response) {
+                            window.pop_loading();
+
+                            self.Properties = response.data["properties"]
+                        }, function (err) {
+                            console.log("err")
+                        }
+                )
+            };
+
+            get_props();
+
+            self.open_property = function (name) {
+                window.location = "/properties/" + name;
+            };
+
+            self.add_property = function () {
+                $http.post("/ajax/properties", self.newPropertyGroup).then(function (response) {
+                    self.newPropertyGroup = {};
+                    get_props();
+                    $("#addappmodal").modal("hide");
+                });
+            };
+
+        }]);
+    </script>
+    </div>
+{% endblock %}

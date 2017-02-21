@@ -38,19 +38,17 @@
                             window.pop_loading();
                             var memory_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                var timestamp = moment.parseZone(response.data.memory[i]["Timestamp"]).unix();
-                                console.log("mm: " + timestamp);
-                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Mbytes"]]);
+                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Mbytes"]]);
                             }
 
                             var cpu_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Cpu"] / 100]);
+                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Cpu"] / 100]);
                             }
 
                             var network_usage = [];
                             for (var i = 0; i < response.data.memory.length; i++) {
-                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate(), response.data.memory[i]["Network"]]);
+                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Network"]]);
                             }
 
                             console.log(memory_usage);

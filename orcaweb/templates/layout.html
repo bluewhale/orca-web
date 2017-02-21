@@ -13,6 +13,9 @@
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 
+<link rel="shortcut icon" href="{{ url_for('static', filename="images/orca1_black.png") }}">
+
+<title>Orca Dashboard</title>
 </head>
 
 <body>
@@ -326,11 +329,12 @@
 </script>
 
 <div id="topnav">
-    <div class="orcatitle">orca</div>
+    <div class="orcatitle"><img src="{{ url_for('static', filename="images/orca1.png") }}" style="width: 30px;"> orca</div>
     <div class="leftnavitem">
         <div id="navitem_apps" class="navitem"><a href="/">Apps</a></div>
         <div id="navitem_servers" class="navitem"><a href="/servers">Servers</a></div>
         <div id="navitem_events" class="navitem"><a href="/audit">Events</a></div>
+        <div id="navitem_events" class="navitem"><a href="/properties">Properties</a></div>
     </div>
     <div class="rightnavitem">
         <div id="navitem_settings" class="navitem"><a href="/settings">Settings</a></div>
