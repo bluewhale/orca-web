@@ -57,7 +57,6 @@ def route_applications_get__by_vpc():
         else:
             app["Status"] = "Disabled"
         ret.append(app)
-
     return flask.jsonify(applications=ret)
 
 
@@ -156,6 +155,10 @@ def ajax__route_application_post_configuration(name):
     api__trainer.set__configuration__applications_app__config(name, request.json)
     return ""
 
+@app.route("/application/<name>/config/<version>")
+def application_configuration_version(name, version):
+    return flask.jsonify(configuration=api__trainer.get__configuration__applications_app(name)["PublishedConfig"][version])
+
 
 @app.route("/settings", methods=["POST"])
 @login_required
@@ -209,25 +212,19 @@ def route_application_overview(name):
 @app.route("/ajax/application/<name>/servers", methods=["GET"])
 @login_required
 def ajax__route_application_servers(name):
-    servers = []
-    cloud_layout = api__trainer.get__configuration__cloud_state()
-    for hostid, server in cloud_layout["Current"]["Layout"].items():
-        for name, application in server["Apps"].items():
-            if name == name:
-                servers.append(server)
-    return flask.jsonify(servers=servers)
-
-
-@app.route("/ajax/application/<name>/servers/desired", methods=["GET"])
-@login_required
-def ajax__route_application_servers_desired(name):
-    servers = []
-    cloud_layout = api__trainer.get__configuration__cloud_state()
-    for hostid, server in cloud_layout["Desired"]["Layout"].items():
-        for name, application in server["Apps"].items():
-            if name == name:
-                servers.append(server)
-    return flask.jsonify(servers=servers)
+    instances = []
+    cloud_layout = api__trainer.get__status__servers()
+    for hostid, server in cloud_layout.items():
+        if server["Apps"]:
+            for application in server["Apps"]:
+                if name == name:
+                    server = {
+                        "Ip": server["Ip"],
+                        "Id": server["Id"],
+                        "App": application
+                    }
+                    instances.append(server)
+    return flask.jsonify(servers=instances)
 
 
 @app.route("/ajax/application/<name>/servers/memory", methods=["GET"])

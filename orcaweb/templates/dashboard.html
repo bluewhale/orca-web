@@ -39,6 +39,10 @@
                             <i class="fa fa fa-line-chart icon-fixed-width" aria-hidden="true"></i> Scaling <span
                                 ng-show="main.scaling_count > 0" class="badge" ng-bind="main.scaling_count"></span>
                         </div>
+                        <div id="nav__deploying" ng-click="main.show__failing()" class="appNavItem">
+                            <i class="fa fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Failing <span
+                                ng-show="main.failing_count > 0" class="badge" ng-bind="main.failing_count"></span>
+                        </div>
                         <div id="nav__offline" ng-click="main.show__offline_and_warnings()" class="appNavItem">
                             <i class="fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Offline <span
                                 ng-show="main.offline_count > 0" class="badge" ng-bind="main.offline_count"></span>
@@ -210,6 +214,7 @@
                 self.affinitytags = {};
                 self.scaling_count = 0;
                 self.offline_count = 0;
+                self.failing_count = 0;
 
                 var get_applications = function (filter_method) {
                     window.push_loading();
@@ -249,6 +254,10 @@
                                     }
                                     if (self.applications[i]["Running"] != self.applications[i]["DesiredDeployment"]) {
                                         self.scaling_count += 1;
+                                    }
+
+                                    if(self.applications[i]["Failed"] > 0){
+                                        self.failing_count += 1
                                     }
                                 }
                             }, function (err) {
@@ -317,6 +326,19 @@
                             if (item["Config"][key]["GroupingTag"] == network) {
                                 return true;
                             }
+                        }
+
+                        return false;
+                    });
+                };
+
+                self.show__failing = function (network) {
+                    $(".appNavItem").removeClass("selected");
+                    $("#nav__affinitytags_" + network).addClass("selected");
+
+                    get_applications(function (item) {
+                        if(item["Failed"] > 0){
+                            return true
                         }
 
                         return false;
