@@ -94,6 +94,18 @@ def get__status__server(name):
 def set__configuration__cloud(object):
     __authenticated_post_request("state/config/cloud?", data=json.dumps(object))
 
+def set__properties(object):
+    __authenticated_post_request("properties?", data=json.dumps(object))
+
+def get__properties():
+    properties = []
+    for value in __authenticated_get_request("properties?").itervalues():
+        properties.append(value)
+    return properties
+
+def get__properties_by_name(name):
+    return __authenticated_get_request("properties?")[name]
+
 def set__settings(object):
     __authenticated_post_request("settings?", data=json.dumps(object))
 

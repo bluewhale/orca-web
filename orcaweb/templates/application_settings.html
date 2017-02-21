@@ -69,6 +69,17 @@
                             <input type="number" class="form-control"
                                    ng-model="main.application.DesiredDeployment">
                         </div>
+
+                        <div class="form-group">
+                            <label>Property Group</label>
+                            <div class="form-group form-inline" ng-repeat="mapping in main.application.PropertyGroups">
+                                <input type="text" class="form-control" ng-model="mapping.Name" placeholder="Name">
+                                <a ng-click="main.delete_property_membership(mapping.Name)"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
+                            </div>
+                            <a ng-click="main.create_property_membership()">Add</a>
+                        </div>
+
                     </div>
                 </div>
 
@@ -225,6 +236,27 @@
                     get_application();
                 });
             };
+
+            self.create_property_membership = function () {
+                console.log(self.application.PropertyGroups);
+                if (!self.application.PropertyGroups) {
+                    self.application.PropertyGroups = []
+                }
+                self.application.PropertyGroups.push({
+                    "Name": ""
+                })
+            };
+            self.delete_property_membership = function (name) {
+                var new_items = [];
+                for (var i = 0; i < self.application.PropertyGroups.length; i++) {
+                    if (!(self.application.PropertyGroups[i]["Name"] == name)) {
+                        new_items.push(self.application.PropertyGroups[i]);
+                    }
+                }
+
+                self.application.PropertyGroups = new_items;
+            };
+
         }]);
 
     </script>
