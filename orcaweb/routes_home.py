@@ -95,7 +95,6 @@ def ajax__route_settings_post():
     api__trainer.set__settings(request.json)
     return ""
 
-
 @app.route("/ajax/application/<name>", methods=["GET"])
 @login_required
 def ajax__route_application(name):
@@ -129,7 +128,24 @@ def ajax__route_server_audit(name):
 @app.route("/ajax/application/<name>", methods=["POST"])
 @login_required
 def ajax__route_application_post(name):
-    api__trainer.set__configuration__applications_app(name, request.json)
+    config = request.json
+    schedule = {}
+    for day in range(0, 7):
+        schedule[day] = {}
+        for minutes in range(0, 1440, 60):
+            schedule[day][minutes] = 0
+
+    for part in request.json['ScheduleParts']:
+        day = part['StartDay']
+        while day < part['StartDay'] + part['Days']:
+            minutes = part['StartMinutes']
+            while minutes < part['StartMinutes'] + part['Minutes']:
+                if schedule[day][minutes] < part['Desired']:
+                    schedule[day][minutes] = part['Desired']
+                minutes += 60
+            day += 1
+    config['DeploymentSchedule'] = schedule
+    api__trainer.set__configuration__applications_app(name, config)
     return ""
 
 
