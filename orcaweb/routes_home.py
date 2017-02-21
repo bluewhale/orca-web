@@ -133,7 +133,7 @@ def ajax__route_application_post(name):
     schedule = {}
     for day in range(0, 7):
         schedule[day] = {}
-        for minutes in range(0, 1440, 60):
+        for minutes in range(0, 1500, 60):
             schedule[day][minutes] = 0
 
     for part in request.json['ScheduleParts']:
