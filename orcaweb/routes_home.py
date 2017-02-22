@@ -138,13 +138,16 @@ def ajax__route_application_post(name):
     for part in request.json['ScheduleParts']:
         day = part['StartDay']
         while day < part['StartDay'] + part['Days']:
-            minutes = part['StartMinutes']
-            while minutes < part['StartMinutes'] + part['Minutes']:
+            minutes = part['StartMinute']
+            while minutes < part['StartMinute'] + part['Minutes']:
                 if schedule[day][minutes] < part['Desired']:
                     schedule[day][minutes] = part['Desired']
                 minutes += 60
             day += 1
     config['DeploymentSchedule'] = schedule
+
+    for part in config['ScheduleParts']:
+        part['Id'] = int(part['Id'])
     api__trainer.set__configuration__applications_app(name, config)
     return ""
 
