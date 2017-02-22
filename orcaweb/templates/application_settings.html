@@ -98,23 +98,6 @@
                         </div>
 
                         <div class="col-lg-8">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                             <style>
                                 #schedule-table {
                                 }
@@ -154,6 +137,7 @@
                                 tr:nth-child(even) {background-color: #f2f2f2}
 
                             </style>
+
                             <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
                             <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
                             <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
@@ -202,6 +186,7 @@
                                                 $(event.target).attr('data-Minutes', hours);
                                                 $(event.target).attr('data-Days', days);
                                             }});
+
                                         $('.schedule-elem').draggable({
                                             grid: [day_width, minutes_height*60],
                                             containment: "#schedule-drag",
@@ -342,24 +327,6 @@
                                     {% endfor %}
                                 </table>
                             </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                         </div>
                     </div>
                 </div>

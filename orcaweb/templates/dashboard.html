@@ -24,6 +24,23 @@
                 .appNavItem:hover {
                     background-color: whitesmoke;
                 }
+
+                .scaling {
+                    background-color:blue !important;
+                }
+
+                .failing {
+                    background-color:orange !important;
+                }
+
+                .offline {
+                    background-color:red !important;
+                }
+
+                .online {
+                    background-color: whitesmoke !important;
+                }
+
             </style>
 
             <div class="row">
@@ -41,11 +58,11 @@
                         </div>
                         <div id="nav__deploying" ng-click="main.show__failing()" class="appNavItem">
                             <i class="fa fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Failing <span
-                                ng-show="main.failing_count > 0" class="badge" ng-bind="main.failing_count"></span>
+                                ng-show="main.failing_count > 0" class="badge failing" ng-bind="main.failing_count"></span>
                         </div>
                         <div id="nav__offline" ng-click="main.show__offline_and_warnings()" class="appNavItem">
                             <i class="fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Offline <span
-                                ng-show="main.offline_count > 0" class="badge" ng-bind="main.offline_count"></span>
+                                ng-show="main.offline_count > 0" class="badge offline" ng-bind="main.offline_count"></span>
                         </div>
 
                         <br><br>
@@ -115,7 +132,7 @@
                             <div class="row">
                                 <div class="col-md-4" style="">
                                     <div class="box" style="">
-                                        <div class="boxtitle">
+                                        <div class="boxtitle  {{ group[0].StateClass }}">
                                             <a href="/application/{{ group[0].Name }}/overview"
                                                ng-bind="group[0].Name"></a>
                                         </div>
@@ -134,7 +151,7 @@
                                 </div>
                                 <div ng-show="group[1].Name" class="col-md-4" style="">
                                     <div class="box" style="">
-                                        <div class="boxtitle">
+                                        <div class="boxtitle  {{ group[0].StateClass }}">
                                             <a href="/application/{{ group[1].Name }}/overview"
                                                ng-bind="group[1].Name"></a>
                                         </div>
@@ -153,7 +170,7 @@
                                 </div>
                                 <div ng-show="group[2].Name" class="col-md-4" style="">
                                     <div class="box" style="">
-                                        <div class="boxtitle">
+                                        <div class="boxtitle  {{ group[0].StateClass }}">
                                             <a href="/application/{{ group[2].Name }}/overview"
                                                ng-bind="group[2].Name"></a>
                                         </div>
