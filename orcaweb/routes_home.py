@@ -217,7 +217,7 @@ def ajax__route_application_servers(name):
     for hostid, server in cloud_layout.items():
         if server["Apps"]:
             for application in server["Apps"]:
-                if name == name:
+                if name == application["Name"]:
                     server = {
                         "Ip": server["Ip"],
                         "Id": server["Id"],
