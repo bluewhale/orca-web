@@ -175,20 +175,22 @@
 
                                 var Schedule = function() {
                                     function init(scheduleElems) {
-                                        scheduleElems.forEach(function(elem) {
-                                            if (!$('#schedule-elem-' + elem['Id']).length) {
-                                                var color = get_color();
-                                                $('#schedule').append('<div title="Desired: ' + elem['Desired'] + '" style="z-index: ' + elem['Desired'] + ';position:absolute;background-color:' + color.replace("OPACITY", "0.5") + '" id="schedule-elem-' + elem['Id'] + '" class="schedule-elem draggable" data-Id="' + elem['Id'] + '" data-Days="' + elem['Days'] + '" data-Minutes="' + elem['Minutes'] + '" data-Desired="' + elem['Desired'] + '">' +
-                                                    '<input onkeydown="preventSubmit()" style="display:none;" class="desired-val" type="number" value="' + elem['Desired'] + '" /><div class="remove-schedule-elem"><i class="fa fa-close" aria-hidden="true"></i></div><span>Desired: ' + elem['Desired'] + '</span></div>');
+                                        if (scheduleElems != undefined && scheduleElems instanceof Array) {
+                                            scheduleElems.forEach(function(elem) {
+                                                if (!$('#schedule-elem-' + elem['Id']).length) {
+                                                    var color = get_color();
+                                                    $('#schedule').append('<div title="Desired: ' + elem['Desired'] + '" style="z-index: ' + elem['Desired'] + ';position:absolute;background-color:' + color.replace("OPACITY", "0.5") + '" id="schedule-elem-' + elem['Id'] + '" class="schedule-elem draggable" data-Id="' + elem['Id'] + '" data-Days="' + elem['Days'] + '" data-Minutes="' + elem['Minutes'] + '" data-Desired="' + elem['Desired'] + '">' +
+                                                        '<input onkeydown="preventSubmit()" style="display:none;" class="desired-val" type="number" value="' + elem['Desired'] + '" /><div class="remove-schedule-elem"><i class="fa fa-close" aria-hidden="true"></i></div><span>Desired: ' + elem['Desired'] + '</span></div>');
 
-                                                $('#schedule-elem-' + elem['Id']).css('left', day_width * (elem['StartDay'] + 1) + $('#schedule-table')[0].offsetLeft);
-                                                $('#schedule-elem-' + elem['Id']).css('top', minutes_height * elem['StartMinutes'] + $('#schedule-table')[0].offsetTop);
-                                                $('#schedule-elem-' + elem['Id']).css('width', day_width * elem['Days']);
-                                                $('#schedule-elem-' + elem['Id']).css('height', minutes_height * elem['Minutes']);
-                                            }
-                                        });
+                                                    $('#schedule-elem-' + elem['Id']).css('left', day_width * (elem['StartDay'] + 1) + $('#schedule-table')[0].offsetLeft);
+                                                    $('#schedule-elem-' + elem['Id']).css('top', minutes_height * elem['StartMinutes'] + $('#schedule-table')[0].offsetTop);
+                                                    $('#schedule-elem-' + elem['Id']).css('width', day_width * elem['Days']);
+                                                    $('#schedule-elem-' + elem['Id']).css('height', minutes_height * elem['Minutes']);
+                                                }
+                                            });
 
-                                        make_draggable();
+                                            make_draggable();
+                                        }
                                     }
 
                                     function make_draggable() {
