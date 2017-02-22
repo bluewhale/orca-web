@@ -35,7 +35,6 @@
             font-size: 30px;
         }
 
-
         .statpill-root {
             padding-left: 0px !important;
         }
@@ -90,13 +89,15 @@
                         <div class="col-md-4 statpill-root border-right">
                             <div class="">
                                 <div ng-repeat="server in main.servers">
-                                    <div ng-click="main.open_server(server.Id)" class="box graphbox hoverselect">
+                                    <div class="box graphbox hoverselect">
                                         <div>Server: <span ng-bind="server.Id"></span></div>
                                         <div>Ip Adddress: <span ng-bind="server.Ip"></span></div>
-                                        <div>State: <span ng-bind="server.State"></span></div>
+                                        <div>Application State: <span ng-bind="server.App.State"></span></div>
+                                        <div>Application Version: <span ng-bind="server.App.Version"></span></div>
+                                        <a href="#" ng-click="main.open_server(server.Id)">Stats</a>
+                                        <a href="#" ng-click="main.open_config(server.App.Name, server.App.Version)">Config</a>
                                     </div>
                                     <br>
-
                                 </div>
                             </div>
                         </div>
@@ -116,23 +117,19 @@
                 window.location = "/application/{{ name }}/server/" + dudes;
             };
 
+            self.open_config = function (application, version) {
+                window.location = "/application/" + application + "/config/" + version;
+            };
+
             var get_current_servers = function () {
                 window.push_loading();
 
-                return $http.get("/ajax/servers").then(
+                return $http.get("/ajax/application/{{ name }}/servers").then(
                         function (response) {
                             self.servers = [];
                             for (var i = 0; i < response.data.servers.length; i++) {
                                 var individual_server = response.data.servers[i];
-                                if (individual_server["Apps"]) {
-
-                                    for (var n = 0; n < individual_server["Apps"].length; n++) {
-                                        if (individual_server["Apps"][n]["Name"] == "{{ name }}") {
-                                            self.servers.push(individual_server);
-                                        }
-                                    }
-                                }
-
+                                self.servers.push(individual_server);
                             }
 
                             self.current_servers_count = self.servers.length;

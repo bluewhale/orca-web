@@ -82,10 +82,6 @@ def get__settings():
     return response
 
 
-def get__configuration__cloud_state():
-    response = __authenticated_get_request("state/cloud?")
-    return response
-
 def get__status__server(name):
     response = __authenticated_get_request("state?")[name]
     return response
