@@ -240,6 +240,7 @@
                     self.groupedApplications = [];
                     self.scaling_count = 0;
                     self.offline_count = 0;
+                    self.failing_count = 0;
 
                     return $http.get("/ajax/applications/by/vpc").then(
                             function (response) {
