@@ -187,6 +187,27 @@
                     </div>
                 </div>
                 <br>
+                <div class="configuration_row row box">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Logging Webhooks</div>
+                        <div class="subtext">
+                            Push logs to a http post webhook like elk.
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>Endpoints</label>
+                            <div class="form-group form-inline" ng-repeat="mapping in main.settings.LoggingWebHook">
+                                <input type="text" class="form-control" ng-model="mapping.Uri" placeholder="Url">
+                                <a ng-click="main.delete_webhook_logging(mapping.Uri)"><i
+                                        class="glyphicon glyphicon-remove"></i></a>
+                            </div>
+                            <a ng-click="main.create_webhook_logging()">Add Webhook</a>
+                        </div>
+                    </div>
+                </div>
+                <br>
                 <button type="submit" class="btn btn-default">Save Settings</button>
             </form>
 
@@ -248,6 +269,25 @@
                         }
 
                         self.settings.AuditWebhooks = new_items;
+                    };
+
+                    self.create_webhook_logging = function () {
+                        if (!self.settings.LoggingWebHook) {
+                            self.settings.LoggingWebHook = []
+                        }
+                        self.settings.LoggingWebHook.push({
+                            "Uri": ""
+                        })
+                    };
+                    self.delete_webhook_logging = function (url) {
+                        var new_items = [];
+                        for (var i = 0; i < self.settings.LoggingWebHook.length; i++) {
+                            if (!(self.settings.LoggingWebHook[i]["Uri"] == url)) {
+                                new_items.push(self.settings.LoggingWebHook[i]);
+                            }
+                        }
+
+                        self.settings.LoggingWebHook = new_items;
                     };
 
                 }]);
