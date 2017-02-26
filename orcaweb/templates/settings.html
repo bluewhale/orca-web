@@ -17,6 +17,47 @@
             <form name="settingsForm" ng-submit="main.save()">
                 <div class="configuration_row row box">
                     <div class="col-lg-4">
+                        <div class="subtitle">General Settings</div>
+                        <div class="subtext">
+                            Configure general settings.
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label>Disable Planning</label>
+                            <input type="checkbox" class="form-control" ng-model="main.settings.PlanningDisabled">
+                        </div>
+                        <div class="form-group">
+                            <label>Env Name</label>
+                            <input type="text" class="form-control" ng-model="main.settings.EnvName">
+                        </div>
+                        <div class="form-group">
+                            <label>Trainer API Port</label>
+                            <input type="number" class="form-control" ng-model="main.settings.ApiPort">
+                        </div>
+                        <div class="form-group">
+                            <label>Trainer API Uri</label>
+                            <input type="text" class="form-control" ng-model="main.settings.Uri">
+                        </div>
+                        <div class="form-group">
+                            <label>Trainer Logger Port</label>
+                            <input type="number" class="form-control" ng-model="main.settings.LoggingPort">
+                        </div>
+                        <div class="form-group">
+                            <label>Trainer Logger Uri</label>
+                            <input type="text" class="form-control" ng-model="main.settings.LoggingUri">
+                        </div>
+                        <div class="form-group">
+                            <label>Host Authentication Token</label>
+                            <input type="text" class="form-control" ng-model="main.settings.HostToken">
+                        </div>
+                    </div>
+                </div>
+                <br>
+
+                <div class="configuration_row row box">
+                    <div class="col-lg-4">
                         <div class="subtitle">Amazon Configuration</div>
                         <div class="subtext">
                             Configure amazon aws settings.
@@ -62,45 +103,10 @@
                         </div>
                         <div class="form-group">
                             <label>Spot Instance Bid</label>
-                            <input type="number" class="form-control" ng-model="main.settings.AWSSpotPrice" step="0.0001">
+                            <input type="number" class="form-control" ng-model="main.settings.AWSSpotPrice"
+                                   step="0.0001">
                         </div>
 
-                    </div>
-                </div>
-                <br>
-                <div class="configuration_row row box">
-                    <div class="col-lg-4">
-                        <div class="subtitle">General Settings</div>
-                        <div class="subtext">
-                            Configure general settings.
-                        </div>
-                    </div>
-
-                    <div class="col-lg-8">
-                        <div class="form-group">
-                            <label>Env  Name</label>
-                            <input type="text" class="form-control" ng-model="main.settings.EnvName">
-                        </div>
-                        <div class="form-group">
-                            <label>Trainer API Port</label>
-                            <input type="number" class="form-control" ng-model="main.settings.ApiPort">
-                        </div>
-                        <div class="form-group">
-                            <label>Trainer API Uri</label>
-                            <input type="text" class="form-control" ng-model="main.settings.Uri">
-                        </div>
-                        <div class="form-group">
-                            <label>Trainer Logger Port</label>
-                            <input type="number" class="form-control" ng-model="main.settings.LoggingPort">
-                        </div>
-                        <div class="form-group">
-                            <label>Trainer Logger Uri</label>
-                            <input type="text" class="form-control" ng-model="main.settings.LoggingUri">
-                        </div>
-                        <div class="form-group">
-                            <label>Host Authentication Token</label>
-                            <input type="text" class="form-control" ng-model="main.settings.HostToken">
-                        </div>
                     </div>
                 </div>
                 <br>
@@ -136,7 +142,8 @@
                     <div class="col-lg-4">
                         <div class="subtitle">API Access Tokens</div>
                         <div class="subtext">
-                            Configure api access tokens that can be used for programatic api access without authentication.
+                            Configure api access tokens that can be used for programatic api access without
+                            authentication.
                         </div>
                     </div>
 
@@ -144,7 +151,8 @@
                         <div class="form-group">
                             <label>Access Token</label>
                             <div class="form-group form-inline" ng-repeat="mapping in main.settings.ApiTokens">
-                                <input type="text" class="form-control" ng-model="mapping.Token" placeholder="Token Key">
+                                <input type="text" class="form-control" ng-model="mapping.Token"
+                                       placeholder="Token Key">
                                 <a ng-click="main.delete_token(mapping.Token)"><i
                                         class="glyphicon glyphicon-remove"></i></a>
                             </div>
@@ -182,23 +190,23 @@
                 <button type="submit" class="btn btn-default">Save Settings</button>
             </form>
 
-        <script>
+            <script>
                 angular.module("Settings", []).controller("Main", ["$http", function ($http) {
                     var self = this;
                     self.settings = {};
 
-                    var get_settings = function(){
+                    var get_settings = function () {
                         return $http.get("/ajax/settings").then(
-                                function(response){
+                                function (response) {
                                     self.settings = response.data
-                                }, function(err){
+                                }, function (err) {
                                     console.log("err")
                                 }
                         )
                     };
                     get_settings();
-                    self.save = function(){
-                        $http.post("/ajax/settings", self.settings).then(function(response){
+                    self.save = function () {
+                        $http.post("/ajax/settings", self.settings).then(function (response) {
                             get_settings();
                         });
                     };
@@ -243,7 +251,7 @@
                     };
 
                 }]);
-        </script>
+            </script>
         </div>
     </div>
 {% endblock %}
