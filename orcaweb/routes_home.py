@@ -145,7 +145,10 @@ def ajax__route_application_post(name):
                 minutes += 60
             day += 1
 
-    config['DeploymentSchedule']['Schedule'] = schedule
+
+    if "DeploymentSchedule" in config:
+        config['DeploymentSchedule']['Schedule'] = schedule
+
     for part in config['ScheduleParts']:
         part['Id'] = int(part['Id'])
     api__trainer.set__configuration__applications_app(name, config)
