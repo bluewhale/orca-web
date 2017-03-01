@@ -129,28 +129,31 @@ def ajax__route_server_audit(name):
 @login_required
 def ajax__route_application_post(name):
     config = request.json
-    schedule = {}
-    for day in range(0, 7):
-        schedule[day] = {}
-        for minutes in range(0, 1500, 60):
-            schedule[day][minutes] = 0
+    if not config["DisableSchedule"]:
+        schedule = {}
+        for day in range(0, 7):
+            schedule[day] = {}
+            for minutes in range(0, 1500, 60):
+                schedule[day][minutes] = 0
 
-    for part in request.json['ScheduleParts']:
-        day = part['StartDay']
-        while day < part['StartDay'] + part['Days']:
-            minutes = part['StartMinute'] - 60
-            while minutes < part['StartMinute'] - 60 + part['Minutes']:
-                if schedule[day][minutes] < part['Desired']:
-                    schedule[day][minutes] = part['Desired']
-                minutes += 60
-            day += 1
+        for part in request.json['ScheduleParts']:
+            day = part['StartDay']
+            while day < part['StartDay'] + part['Days']:
+                minutes = part['StartMinute'] - 60
+                while minutes < part['StartMinute'] - 60 + part['Minutes']:
+                    if schedule[day][minutes] < part['Desired']:
+                        schedule[day][minutes] = part['Desired']
+                    minutes += 60
+                day += 1
 
+        if "DeploymentSchedule" in config:
+            config['DeploymentSchedule']['Schedule'] = schedule
 
-    if "DeploymentSchedule" in config:
-        config['DeploymentSchedule']['Schedule'] = schedule
-
-    for part in config['ScheduleParts']:
-        part['Id'] = int(part['Id'])
+        if "ScheduleParts" in config:
+            for part in config['ScheduleParts']:
+                part['Id'] = int(part['Id'])
+    else:
+       config['ScheduleParts'] = []
     api__trainer.set__configuration__applications_app(name, config)
     return ""
 
