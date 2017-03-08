@@ -3,8 +3,6 @@ import json
 import requests
 from flask.ext.login import current_user
 
-from orcaweb import app
-
 
 class NoSession(Exception):
     def __init__(self, message, *args, **kwargs):
@@ -48,9 +46,9 @@ def get__audit(search="", limit="100"):
 
 
 def get__configuration__applications_app(name):
-    for app in get__configuration__applications():
-        if app["Name"] == name:
-            return app
+    for application in get__configuration__applications():
+        if application["Name"] == name:
+            return application
     return None
 
 
@@ -77,6 +75,7 @@ def get__configuration__cloud():
     response = __authenticated_get_request("state/config/cloud?")
     return response
 
+
 def get__settings():
     response = __authenticated_get_request("settings?")
     return response
@@ -90,8 +89,10 @@ def get__status__server(name):
 def set__configuration__cloud(object):
     __authenticated_post_request("state/config/cloud?", data=json.dumps(object))
 
+
 def set__properties(object):
     __authenticated_post_request("properties?", data=json.dumps(object))
+
 
 def get__properties():
     properties = []
@@ -99,8 +100,10 @@ def get__properties():
         properties.append(value)
     return properties
 
+
 def get__properties_by_name(name):
     return __authenticated_get_request("properties?")[name]
+
 
 def set__settings(object):
     __authenticated_post_request("settings?", data=json.dumps(object))
@@ -117,27 +120,39 @@ def get__status__application_count(application_name):
 
 
 def get__status__application_events(application_name, search="", limit="100"):
-    response = __authenticated_get_request("state/cloud/application/audit?application=%s&search=%s&limit=%s" % (application_name, search, limit))
+    response = __authenticated_get_request(
+        "state/cloud/application/audit?application=%s&search=%s&limit=%s" % (application_name, search, limit))
     return response
 
 
 def get__status__application_logs(application_name, search="", limit="100"):
-    response = __authenticated_get_request("state/cloud/application/logs?application=%s&search=%s&limit=%s" % (application_name, search, limit))
+    response = __authenticated_get_request(
+        "state/cloud/application/logs?application=%s&search=%s&limit=%s" % (application_name, search, limit))
     return response
+
 
 def get__status__server_logs(server, search="", limit="100"):
     response = __authenticated_get_request("state/cloud/host/logs?host=%s&search=%s&limit=%s" % (server, search, limit))
     return response
 
+
 def get__status__server_audit(server, search="", limit="100"):
-    response = __authenticated_get_request("state/cloud/host/audit?host=%s&search=%s&limit=%s" % (server,search, limit))
+    response = __authenticated_get_request(
+        "state/cloud/host/audit?host=%s&search=%s&limit=%s" % (server, search, limit))
     return response
+
 
 def get__status__server_memory(server):
     response = __authenticated_get_request("state/cloud/host/performance?host=%s" % (server))
     return response
 
-def get__status__application_server_memory(server, application):
-    response = __authenticated_get_request("state/cloud/application/host/performance?host=%s&application=%s" % (server, application))
+
+def get__status__server_latest(server):
+    response = __authenticated_get_request("state/cloud/host/latest/performance?host=%s" % (server))
     return response
 
+
+def get__status__application_server_memory(server, application):
+    response = __authenticated_get_request(
+        "state/cloud/application/host/performance?host=%s&application=%s" % (server, application))
+    return response

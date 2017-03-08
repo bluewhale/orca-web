@@ -18,6 +18,21 @@
                 .selected {
                     background-color: whitesmoke;
                 }
+                .cube {
+                    float: left;
+                    width: 15px;
+                    height: 25px;
+                    border: 1px solid rgba(0, 0, 0, .2);
+                }
+                .a_hot {
+                    background: #FF0000
+                }
+                .b_warm {
+                    background: #FFA500
+                }
+                .c_cold {
+                    background: #3CBC3C
+                }
             </style>
             <div class="row">
                 <div class="col-md-2">
@@ -72,6 +87,9 @@
                             <tbody>
                             {% raw %}
                             <tr ng-repeat="server in main.servers">
+                                <td>
+                                    <span class="cube" ng-class="server.Temp"></span>
+                                </td>
                                 <td style="white-space: nowrap"><i class="fa fa-server"></i> <a
                                         href="/server/{{ server.Id }}/overview" ng-bind="server.Id"></a></td>
                                 <td>

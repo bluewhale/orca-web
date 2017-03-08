@@ -1,12 +1,9 @@
 import re
-import uuid
-
 import flask
 from flask import render_template
 from flask import request
 from flask import redirect
 from flask.ext.login import login_required
-
 from orcaweb import app
 from orcaweb.services import api__trainer
 
@@ -35,28 +32,28 @@ def route_applications_get__by_vpc():
     ret = []
     servers = api__trainer.get__status__servers()
     applications = api__trainer.get__configuration__applications()
-    for app in applications:
-        app["Running"] = 0
-        app["Failed"] = 0
+    for application in applications:
+        application["Running"] = 0
+        application["Failed"] = 0
 
         for key, server in servers.iteritems():
             if server.get("Apps"):
                 for serverAppState in server.get("Apps", []):
-                    if serverAppState["Name"] == app["Name"]:
+                    if serverAppState["Name"] == application["Name"]:
                         if serverAppState["State"] == "running":
-                            app["Running"] += 1
+                            application["Running"] += 1
                         else:
-                            app["Failed"] += 1
+                            application["Failed"] += 1
 
-        if app["Enabled"]:
-            if app["Running"] == app["DesiredDeployment"]:
-                app["Status"] = "Ok"
+        if application["Enabled"]:
+            if application["Running"] == application["DesiredDeployment"]:
+                application["Status"] = "Ok"
 
-            if app["Running"] != app["DesiredDeployment"]:
-                app["Status"] = "Scaling"
+            if application["Running"] != application["DesiredDeployment"]:
+                application["Status"] = "Scaling"
         else:
-            app["Status"] = "Disabled"
-        ret.append(app)
+            application["Status"] = "Disabled"
+        ret.append(application)
     return flask.jsonify(applications=ret)
 
 
@@ -78,13 +75,25 @@ def ajax__route_settings():
     return flask.jsonify(api__trainer.get__settings())
 
 
+def _server_temperature(server_id):
+    temp = "c_cold"
+    metrics = api__trainer.get__status__server_latest(server_id)
+    if metrics['HardDiskUsagePercent'] > 7000 or metrics['Cpu'] > 5000 or metrics['Mbytes'] > 4000000000:
+        temp = "b_warm"
+    if metrics['HardDiskUsagePercent'] > 9000 or metrics['Cpu'] > 7500 or metrics['Mbytes'] > 7000000000:
+        temp = "a_hot"
+    return temp
+
+
 @app.route("/ajax/servers", methods=["GET"])
 @login_required
 def ajax__route_servers():
     servers = api__trainer.get__status__servers()
     ret = []
     for server in servers.values():
+        server['Temp'] = _server_temperature(server['Id'])
         ret.append(server)
+    ret.sort(key=lambda x: x['Temp'])
     return flask.jsonify(servers=ret)
 
 
@@ -93,6 +102,7 @@ def ajax__route_servers():
 def ajax__route_settings_post():
     api__trainer.set__settings(request.json)
     return ""
+
 
 @app.route("/ajax/application/<name>", methods=["GET"])
 @login_required
@@ -153,7 +163,7 @@ def ajax__route_application_post(name):
             for part in config['ScheduleParts']:
                 part['Id'] = int(part['Id'])
     else:
-       config['ScheduleParts'] = []
+        config['ScheduleParts'] = []
     api__trainer.set__configuration__applications_app(name, config)
     return ""
 
@@ -163,6 +173,7 @@ def ajax__route_application_post(name):
 def ajax__route_application_post_configuration(name):
     api__trainer.set__configuration__applications_app__config(name, request.json)
     return ""
+
 
 @app.route("/application/<name>/config/<version>")
 def application_configuration_version(name, version):
@@ -381,6 +392,7 @@ def ajax__route_properties_post():
 def ajax__route_properties_post_name(name):
     api__trainer.set__properties(request.json)
     return ""
+
 
 @app.route("/ajax/properties/<name>", methods=["GET"])
 @login_required
