@@ -11,7 +11,7 @@ from orcaweb.services import api__trainer
 @app.route("/")
 @login_required
 def route_dashboard():
-    return render_template("dashboard.html", configuration=api__trainer.get__configuration__applications())
+    return render_template("dashboard.html")
 
 
 @app.route("/servers")
@@ -54,6 +54,7 @@ def route_applications_get__by_vpc():
         else:
             application["Status"] = "Disabled"
         ret.append(application)
+    ret.sort(key=lambda x: x['Name'])
     return flask.jsonify(applications=ret)
 
 
