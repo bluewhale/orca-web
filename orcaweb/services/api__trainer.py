@@ -126,15 +126,9 @@ def get__status__application_events(application_name, search="", limit="100"):
     return response
 
 
-def get__status__application_logs(application_name, search="", limit="100"):
+def get__status__application_logs(application_name, search="", limit="100", lasttime=""):
     response = __authenticated_get_request(
         "state/cloud/application/logs?application=%s&search=%s&limit=%s" % (application_name, search, limit))
-    return response
-
-
-def get__status__application_logs_tail(application_name, lasttime, search="", limit="100"):
-    response = __authenticated_get_request(
-        "state/cloud/application/logs/tail?application=%s&lasttime=%s&search=%s&limit=%s" % (application_name, lasttime, search, limit))
     return response
 
 

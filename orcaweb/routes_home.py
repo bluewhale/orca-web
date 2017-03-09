@@ -297,14 +297,7 @@ def ajax__route_application_server_memory(application, server):
 @login_required
 def ajax__route_application_logs(name):
     return flask.jsonify(logs=api__trainer.get__status__application_logs(name, search=flask.request.args.get("search"),
-                                                                         limit=flask.request.args.get("limit")))
-
-
-@app.route("/ajax/application/<name>/logs/tail/<lasttime>", methods=["GET"])
-@login_required
-def ajax__route_application_logs_tail(name, lasttime):
-    return flask.jsonify(logs=api__trainer.get__status__application_logs_tail(name, lasttime, search=flask.request.args.get("search"),
-                                                                              limit=flask.request.args.get("limit")))
+                                                                         limit=flask.request.args.get("limit"), lasttime=flask.request.args.get("lasttime")))
 
 
 def extract_command(string_command):
