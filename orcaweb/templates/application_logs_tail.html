@@ -58,10 +58,10 @@
         <div ng-controller="Main as main">
 
             <div class="logtablebody" style="">
-                <span class="logtablebody-title">Logs - Standard</span>
+                <span class="logtablebody-title">Logs - Tail</span>
                 <form class="form-inline logtablesearch" style="" ng-submit="main.search()">
                     <div class="form-group">
-                        <a class="btn btn-default" href="/application/{{ name }}/logs/tail">Tail</a>
+                        <a class="btn btn-default" href="/application/{{ name }}/logs">Standard</a>
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" id="exampleInputName2" placeholder="Search"
@@ -91,7 +91,9 @@
                     </td>
                 </tr>
                 <tr>
-                    <div ng-show="main.empty"><i>No Instances Found</i></div>
+                    <td>
+                        <div ng-show="main.empty"><i>No additional logs found yet</i><br></div>
+                    </td>
                 </tr>
                 {% endraw %}
                 </tbody>
@@ -100,26 +102,37 @@
     </div>
 
     <script>
-        angular.module("ServerSettings", []).controller("Main", ["$http", function ($http) {
+        angular.module("ServerSettings", []).controller("Main", ["$http", "$interval", function ($http, $interval) {
             var self = this;
             self.servers = [];
             self.search_expression = "";
             self.limit = "100";
             self.empty = false;
             self.logs = [];
+            self.lasttime = "0";
             var get_events = function () {
-                self.logs = [];
                 window.push_loading();
-                return $http.get("/ajax/application/{{ name }}/logs?search=" + self.search_expression + "&limit=" + self.limit).then(
+                return $http.get("/ajax/application/{{ name }}/logs/tail/" + self.lasttime + "?search=" + self.search_expression + "&limit=" + self.limit).then(
                         function (response) {
                             var logs = response.data.logs;
                             if (logs) {
+                                var limit = parseInt(self.limit)
+                                if (logs.length === limit) {
+                                    self.logs = []
+                                } else {
+                                    var slice = -limit;
+                                    if (logs.length < limit) {
+                                        slice = -(limit - logs.length)
+                                    }
+                                    self.logs = self.logs.slice(slice);
+                                }
                                 for (var i = logs.length - 1; i >= 0; i--) {
+                                    self.lasttime = logs[i]["Timestamp"];
                                     logs[i]["Timestamp"] = moment.parseZone(logs[i]["Timestamp"]).toDate();
                                     self.logs.push(logs[i]);
                                 }
 
-                                self.empty = self.logs.length == 0;
+                                self.empty = self.logs.length === 0;
                             } else {
                                 self.empty = true;
                             }
@@ -131,6 +144,8 @@
                         }
                 )
             };
+
+            $interval(get_events, 1000);
 
             self.search = function () {
                 get_events();

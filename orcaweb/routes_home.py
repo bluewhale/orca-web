@@ -211,6 +211,12 @@ def route_application_logs(name):
     return render_template("application_logs.html", name=name)
 
 
+@app.route("/application/<name>/logs/tail", methods=["GET"])
+@login_required
+def route_application_logs_tail(name):
+    return render_template("application_logs_tail.html", name=name)
+
+
 @app.route("/ajax/events", methods=["GET"])
 @login_required
 def route_events():
@@ -292,6 +298,13 @@ def ajax__route_application_server_memory(application, server):
 def ajax__route_application_logs(name):
     return flask.jsonify(logs=api__trainer.get__status__application_logs(name, search=flask.request.args.get("search"),
                                                                          limit=flask.request.args.get("limit")))
+
+
+@app.route("/ajax/application/<name>/logs/tail/<lasttime>", methods=["GET"])
+@login_required
+def ajax__route_application_logs_tail(name, lasttime):
+    return flask.jsonify(logs=api__trainer.get__status__application_logs_tail(name, lasttime, search=flask.request.args.get("search"),
+                                                                              limit=flask.request.args.get("limit")))
 
 
 def extract_command(string_command):

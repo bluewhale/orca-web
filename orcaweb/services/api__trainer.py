@@ -14,6 +14,7 @@ def __authenticated_get_request(uri):
     from orcaweb.routes_base import session__get_hostname
 
     response = requests.get("%s/%s&token=%s" % (session__get_hostname(), uri, current_user.get_id()))
+    print "%s/%s&token=%s" % (session__get_hostname(), uri, current_user.get_id())
     if response.status_code == 403:
         raise NoSession("Invalid or no session")
     return json.loads(response.text)
@@ -128,6 +129,12 @@ def get__status__application_events(application_name, search="", limit="100"):
 def get__status__application_logs(application_name, search="", limit="100"):
     response = __authenticated_get_request(
         "state/cloud/application/logs?application=%s&search=%s&limit=%s" % (application_name, search, limit))
+    return response
+
+
+def get__status__application_logs_tail(application_name, lasttime, search="", limit="100"):
+    response = __authenticated_get_request(
+        "state/cloud/application/logs/tail?application=%s&lasttime=%s&search=%s&limit=%s" % (application_name, lasttime, search, limit))
     return response
 
 
