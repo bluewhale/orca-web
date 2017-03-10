@@ -65,6 +65,9 @@
                 <span class="logtablebody-title">Logs</span>
                 <form class="form-inline logtablesearch" style="" ng-submit="main.search()">
                     <div class="form-group">
+                        <button class="btn btn-default" ng-click="main.toogleTail()" ng-bind="main.tail_button"></button>
+                    </div>
+                    <div class="form-group">
                         <input type="text" class="form-control" id="exampleInputName2" placeholder="Search"
                                ng-model="main.search_expression">
                     </div>
@@ -101,33 +104,68 @@
     </div>
 
     <script>
-        angular.module("ServerSettings", []).controller("Main", ["$http", function ($http) {
+        angular.module("ServerSettings", []).controller("Main", ["$http", "$interval", function ($http, $interval) {
             var self = this;
             self.servers = [];
             self.search_expression = "";
             self.limit = "100";
             self.empty = false;
             self.logs = []
-
+            self.tail_button = "Tail"
+            self.tail = false;
+            self.lasttime = "0";
+            self.interval_promise;
             var get_events = function () {
                 window.push_loading();
-                self.logs = [];
-                return $http.get("/ajax/server/{{ name }}/logs?search=" + self.search_expression + "&limit=" + self.limit).then(
+                var lasttime_param = "";
+                if (self.tail) {
+                    lasttime_param = "&lasttime=" + self.lasttime;
+                }
+                return $http.get("/ajax/server/{{ name }}/logs?search=" + self.search_expression + "&limit=" + self.limit + lasttime_param).then(
                         function (response) {
                             window.pop_loading();
                             var logs = response.data.logs;
-                            for (var i = logs.length - 1; i >= 0; i--) {
-                                logs[i]["Timestamp"] = moment.parseZone(logs[i]["Timestamp"]).toDate();
-                                self.logs.push(logs[i]);
+                            if (logs) {
+                                if (self.tail) {
+                                    var limit = parseInt(self.limit);
+                                    if (logs.length === limit) {
+                                        self.logs = [];
+                                    } else {
+                                        var slice = -limit;
+                                        if (logs.length < limit) {
+                                            slice = -(limit - logs.length);
+                                        }
+                                        self.logs = self.logs.slice(slice);
+                                    }
+                                } else {
+                                    self.logs = [];
+                                }
+                                for (var i = logs.length - 1; i >= 0; i--) {
+                                    self.lasttime = logs[i]["Timestamp"];
+                                    logs[i]["Timestamp"] = moment.parseZone(logs[i]["Timestamp"]).toDate();
+                                    self.logs.push(logs[i]);
+                                }
+                                self.empty = self.logs.length == 0;
+                            } else {
+                                self.empty = true;
                             }
 
-                            self.empty = self.logs.length == 0;
                         }, function (err) {
                             console.log("err")
                         }
                 )
             };
 
+            self.toogleTail = function() {
+                self.tail = !self.tail;
+                if (self.tail) {
+                    self.interval_promise = $interval(get_events, 2000);
+                    self.tail_button = "Stop Tail"
+                } else {
+                    $interval.cancel(self.interval_promise);
+                    self.tail_button = "Tail"
+                }
+            }
             self.search = function () {
                 get_events();
             };

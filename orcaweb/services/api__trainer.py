@@ -42,8 +42,8 @@ def get__configuration__applications():
     return response
 
 
-def get__audit(search="", limit="100"):
-    return __authenticated_get_request("state/cloud/audit?&search=%s&limit=%s" % (search, limit))
+def get__audit(search="", limit="100", lasttime=""):
+    return __authenticated_get_request("state/cloud/audit?&search=%s&limit=%s&lasttime=%s" % (search, limit, lasttime))
 
 
 def get__configuration__applications_app(name):
@@ -120,26 +120,26 @@ def get__status__application_count(application_name):
     return response
 
 
-def get__status__application_events(application_name, search="", limit="100"):
+def get__status__application_events(application_name, search="", limit="100", lasttime=""):
     response = __authenticated_get_request(
-        "state/cloud/application/audit?application=%s&search=%s&limit=%s" % (application_name, search, limit))
+        "state/cloud/application/audit?application=%s&search=%s&limit=%s&lasttime=%s" % (application_name, search, limit, lasttime))
     return response
 
 
 def get__status__application_logs(application_name, search="", limit="100", lasttime=""):
     response = __authenticated_get_request(
-        "state/cloud/application/logs?application=%s&search=%s&limit=%s" % (application_name, search, limit))
+        "state/cloud/application/logs?application=%s&search=%s&limit=%s&lasttime=%s" % (application_name, search, limit, lasttime))
     return response
 
 
-def get__status__server_logs(server, search="", limit="100"):
-    response = __authenticated_get_request("state/cloud/host/logs?host=%s&search=%s&limit=%s" % (server, search, limit))
+def get__status__server_logs(server, search="", limit="100", lasttime=""):
+    response = __authenticated_get_request("state/cloud/host/logs?host=%s&search=%s&limit=%s&lasttime=%s" % (server, search, limit, lasttime))
     return response
 
 
-def get__status__server_audit(server, search="", limit="100"):
+def get__status__server_audit(server, search="", limit="100", lasttime=""):
     response = __authenticated_get_request(
-        "state/cloud/host/audit?host=%s&search=%s&limit=%s" % (server, search, limit))
+        "state/cloud/host/audit?host=%s&search=%s&limit=%s&lasttime=%s" % (server, search, limit, lasttime))
     return response
 
 

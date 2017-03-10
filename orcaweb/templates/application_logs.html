@@ -115,7 +115,7 @@
                 window.push_loading();
                 var lasttime_param = "";
                 if (self.tail) {
-                    lasttime_param = "&lasttime" + self.lasttime;
+                    lasttime_param = "&lasttime=" + self.lasttime;
                 }
 
                 return $http.get("/ajax/application/{{ name }}/logs?search=" + self.search_expression + "&limit=" + self.limit + lasttime_param).then(
@@ -123,9 +123,9 @@
                             var logs = response.data.logs;
                             if (logs) {
                                 if (self.tail) {
-                                    var limit = parseInt(self.limit)
+                                    var limit = parseInt(self.limit);
                                     if (logs.length === limit) {
-                                        self.logs = []
+                                        self.logs = [];
                                     } else {
                                         var slice = -limit;
                                         if (logs.length < limit) {

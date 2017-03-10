@@ -18,6 +18,9 @@
                 <span class="logtablebody-title">Audit Events</span>
                 <form class="form-inline logtablesearch" style="" ng-submit="main.search()">
                     <div class="form-group">
+                        <button class="btn btn-default" ng-click="main.toogleTail()" ng-bind="main.tail_button"></button>
+                    </div>
+                    <div class="form-group">
                         <input type="text" class="form-control" id="exampleInputName2" placeholder="Search"
                                ng-model="main.search_expression">
                     </div>
@@ -57,35 +60,71 @@
     </div>
 
     <script>
-        angular.module("ServerSettings", []).controller("Main", ["$http", function ($http) {
+        angular.module("ServerSettings", []).controller("Main", ["$http", "$interval", function ($http, $interval) {
             var self = this;
             self.events = [];
             self.empty = 0;
             self.search_expression = "";
             self.limit = "100";
-
+            self.tail_button = "Tail"
+            self.tail = false;
+            self.lasttime = "0";
+            self.interval_promise;
             var get_events = function () {
                 window.push_loading();
-                self.events = [];
+                var lasttime_param = "";
+                if (self.tail) {
+                    lasttime_param = "&lasttime=" + self.lasttime;
+                }
 
-                return $http.get("/ajax/events?search=" + self.search_expression + "&limit=" + self.limit).then(
+                return $http.get("/ajax/events?search=" + self.search_expression + "&limit=" + self.limit + lasttime_param).then(
                         function (response) {
                             window.pop_loading();
                             var events = response.data.events;
-                            for (var i = events.length - 1; i >= 0; i--) {
-                                var event = events[i];
-                                event["Timestamp"] = moment.parseZone(event["Timestamp"]).toDate();
-                                self.events.push(event);
+                            if (events) {
+                                if (self.tail) {
+                                    var limit = parseInt(self.limit);
+                                    if (events.length === limit) {
+                                        self.events = [];
+                                    } else {
+                                        var slice = -limit;
+                                        if (events.length < limit) {
+                                            slice = -(limit - events.length);
+                                        }
+                                        self.events = self.events.slice(slice);
+                                    }
+                                } else {
+                                    self.events = [];
+                                }
+                                for (var i = events.length - 1; i >= 0; i--) {
+                                    var event = events[i];
+                                    self.lasttime = event["Timestamp"];
+                                    event["Timestamp"] = moment.parseZone(event["Timestamp"]).toDate();
+                                    self.events.push(event);
+                                }
+                                self.empty = events.length == 0;
+                            } else {
+                                self.empty = true;
                             }
-
-                            self.empty = events.length == 0;
                         }, function (err) {
                             console.log("err")
                         }
                 )
             };
 
+            self.toogleTail = function() {
+                self.tail = !self.tail;
+                if (self.tail) {
+                    self.interval_promise = $interval(get_events, 2000);
+                    self.tail_button = "Stop Tail"
+                } else {
+                    $interval.cancel(self.interval_promise);
+                    self.tail_button = "Tail"
+                }
+            }
+
             get_events();
+
             self.search = function () {
                 get_events();
             }
