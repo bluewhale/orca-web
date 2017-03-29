@@ -79,9 +79,9 @@ def ajax__route_settings():
 def _server_temperature(server_id):
     temp = "c_cold"
     metrics = api__trainer.get__status__server_latest(server_id)
-    if metrics['HardDiskUsagePercent'] > 7000 or metrics['Cpu'] > 5000 or metrics['Mbytes'] > 4000000000:
+    if metrics['HardDiskUsagePercent'] > 7000 or metrics['Cpu'] > 5000 or metrics['Mbytes'] > 8000000000:
         temp = "b_warm"
-    if metrics['HardDiskUsagePercent'] > 9000 or metrics['Cpu'] > 7500 or metrics['Mbytes'] > 7000000000:
+    if metrics['HardDiskUsagePercent'] > 9000 or metrics['Cpu'] > 7500 or metrics['Mbytes'] > 15000000000:
         temp = "a_hot"
     return temp
 
