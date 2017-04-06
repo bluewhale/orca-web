@@ -142,9 +142,9 @@
                                     self.logs.push(logs[i]);
                                 }
 
-                                self.empty = self.logs.length == 0;
+                                self.empty = self.logs.length == 0 && !self.tail;
                             } else {
-                                self.empty = true;
+                                self.empty = true && !self.tail;
                             }
 
                             window.pop_loading();
