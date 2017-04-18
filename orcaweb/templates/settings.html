@@ -200,8 +200,12 @@
                             <label>Endpoints</label>
                             <div class="form-group form-inline" ng-repeat="mapping in main.settings.LoggingWebHook">
                                 <input type="text" class="form-control" ng-model="mapping.Uri" placeholder="Url">
-                                <a ng-click="main.delete_webhook_logging(mapping.Uri)"><i
-                                        class="glyphicon glyphicon-remove"></i></a>
+                                <a ng-click="main.delete_webhook_logging(mapping.Uri)"><i class="glyphicon glyphicon-remove"></i></a>
+                                <br>
+                                <input type="text" class="form-control" ng-model="mapping.User" placeholder="User">
+                                <input type="text" class="form-control" ng-model="mapping.Password" placeholder="Password">
+                                <br>
+                                <input type="textarea" class="form-control" ng-model="mapping.Certificate" placeholder="Certificate">
                             </div>
                             <a ng-click="main.create_webhook_logging()">Add Webhook</a>
                         </div>
@@ -276,7 +280,10 @@
                             self.settings.LoggingWebHook = []
                         }
                         self.settings.LoggingWebHook.push({
-                            "Uri": ""
+                            "Uri": "",
+                            "Certificate": "",
+                            "User": "",
+                            "Password": ""
                         })
                     };
                     self.delete_webhook_logging = function (url) {
