@@ -198,10 +198,15 @@
                     <div class="col-lg-8">
                         <div class="form-group">
                             <label>Endpoints</label>
-                            <div class="form-group form-inline" ng-repeat="mapping in main.settings.LoggingWebHook">
+                            <div class="form-group form-inline" ng-repeat="mapping in main.settings.LoggingWebHooks">
                                 <input type="text" class="form-control" ng-model="mapping.Uri" placeholder="Url">
-                                <a ng-click="main.delete_webhook_logging(mapping.Uri)"><i
-                                        class="glyphicon glyphicon-remove"></i></a>
+                                <a ng-click="main.delete_webhook_logging(mapping.Uri)"><i class="glyphicon glyphicon-remove"></i></a>
+                                <br>
+                                <input type="text" class="form-control" ng-model="mapping.User" placeholder="User">
+                                <br>
+                                <input type="password" class="form-control" ng-model="mapping.Password" placeholder="Password">
+                                <br>
+                                <textarea class="form-control" ng-model="mapping.Certificate"  placeholder="Certificate"></textarea>
                             </div>
                             <a ng-click="main.create_webhook_logging()">Add Webhook</a>
                         </div>
@@ -272,22 +277,25 @@
                     };
 
                     self.create_webhook_logging = function () {
-                        if (!self.settings.LoggingWebHook) {
-                            self.settings.LoggingWebHook = []
+                        if (!self.settings.LoggingWebHooks) {
+                            self.settings.LoggingWebHooks = []
                         }
-                        self.settings.LoggingWebHook.push({
-                            "Uri": ""
+                        self.settings.LoggingWebHooks.push({
+                            "Uri": "",
+                            "Certificate": "",
+                            "User": "",
+                            "Password": ""
                         })
                     };
                     self.delete_webhook_logging = function (url) {
                         var new_items = [];
-                        for (var i = 0; i < self.settings.LoggingWebHook.length; i++) {
-                            if (!(self.settings.LoggingWebHook[i]["Uri"] == url)) {
-                                new_items.push(self.settings.LoggingWebHook[i]);
+                        for (var i = 0; i < self.settings.LoggingWebHooks.length; i++) {
+                            if (!(self.settings.LoggingWebHooks[i]["Uri"] == url)) {
+                                new_items.push(self.settings.LoggingWebHooks[i]);
                             }
                         }
 
-                        self.settings.LoggingWebHook = new_items;
+                        self.settings.LoggingWebHooks = new_items;
                     };
 
                 }]);
