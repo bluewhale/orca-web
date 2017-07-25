@@ -152,8 +152,6 @@
                                 running_count.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["InstanceCount"]]);
                             }
 
-                            console.log(running_count);
-
                             Highcharts.chart('count_graph', {
                                 chart: {
                                     type: 'areaspline'

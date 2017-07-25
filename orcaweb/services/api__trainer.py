@@ -42,6 +42,18 @@ def get__configuration__applications():
     return response
 
 
+def get__configuration__applications_status():
+    response = __authenticated_get_request("config/applications/status?")
+    return response
+
+
+def get__configuration__application_status(name):
+    for application in get__configuration__applications_status():
+        if application["Name"] == name:
+            return application
+    return None
+
+
 def get__audit(search="", limit="100", lasttime=""):
     return __authenticated_get_request("state/cloud/audit?&search=%s&limit=%s&lasttime=%s" % (search, limit, lasttime))
 
@@ -133,7 +145,8 @@ def get__status__application_logs(application_name, search="", limit="100", last
 
 
 def get__status__server_logs(server, search="", limit="100", lasttime=""):
-    response = __authenticated_get_request("state/cloud/host/logs?host=%s&search=%s&limit=%s&lasttime=%s" % (server, search, limit, lasttime))
+    response = __authenticated_get_request(
+        "state/cloud/host/logs?host=%s&search=%s&limit=%s&lasttime=%s" % (server, search, limit, lasttime))
     return response
 
 

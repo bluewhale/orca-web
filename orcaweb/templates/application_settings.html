@@ -343,7 +343,7 @@
             self.application = {};
 
             var get_application = function () {
-                return $http.get("/ajax/application/{{ name }}").then(
+                return $http.get("/ajax/application/{{ name }}/status").then(
                         function (response) {
                             self.application = response.data;
                             Schedule.init(self.application['ScheduleParts']);

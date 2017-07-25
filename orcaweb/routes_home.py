@@ -30,31 +30,34 @@ def route_applications_get():
 @login_required
 def route_applications_get__by_vpc():
     ret = []
-    servers = api__trainer.get__status__servers()
-    applications = api__trainer.get__configuration__applications()
-    for application in applications:
-        application["Running"] = 0
-        application["Failed"] = 0
+    try:
+        servers = api__trainer.get__status__servers()
+        applications = api__trainer.get__configuration__applications_status()
+        for application in applications:
+            application["Running"] = 0
+            application["Failed"] = 0
 
-        for key, server in servers.iteritems():
-            if server.get("Apps"):
-                for serverAppState in server.get("Apps", []):
-                    if serverAppState["Name"] == application["Name"]:
-                        if serverAppState["State"] == "running":
-                            application["Running"] += 1
-                        else:
-                            application["Failed"] += 1
+            for key, server in servers.iteritems():
+                if server.get("Apps"):
+                    for serverAppState in server.get("Apps", []):
+                        if serverAppState["Name"] == application["Name"]:
+                            if serverAppState["State"] == "running":
+                                application["Running"] += 1
+                            else:
+                                application["Failed"] += 1
 
-        if application["Enabled"]:
-            if application["Running"] == application["DesiredDeployment"]:
-                application["Status"] = "Ok"
+            if application["Enabled"]:
+                if application["Running"] == application["DesiredDeployment"]:
+                    application["Status"] = "Ok"
 
-            if application["Running"] != application["DesiredDeployment"]:
-                application["Status"] = "Scaling"
-        else:
-            application["Status"] = "Disabled"
-        ret.append(application)
-    ret.sort(key=lambda x: x['Name'])
+                if application["Running"] != application["DesiredDeployment"]:
+                    application["Status"] = "Scaling"
+            else:
+                application["Status"] = "Disabled"
+            ret.append(application)
+        ret.sort(key=lambda x: x['Name'])
+    except Exception as e:
+        print e
     return flask.jsonify(applications=ret)
 
 
@@ -108,7 +111,13 @@ def ajax__route_settings_post():
 @app.route("/ajax/application/<name>", methods=["GET"])
 @login_required
 def ajax__route_application(name):
-    return flask.jsonify(api__trainer.get__configuration__applications_app(name))
+    return flask.jsonify(api__trainer.get__configuration__applications_app__config(name))
+
+
+@app.route("/ajax/application/<name>/status", methods=["GET"])
+@login_required
+def ajax__route_application_status(name):
+    return flask.jsonify(api__trainer.get__configuration__application_status(name))
 
 
 @app.route("/ajax/application/<name>/configuration", methods=["GET"])
