@@ -15,6 +15,9 @@
                 window.open_add_application = function () {
                     $("#addappmodal").modal("show");
                 };
+                 var show = () => {
+                    return false;
+                 }
             </script>
             <style>
                 .selected {
@@ -121,6 +124,11 @@
                             text-decoration: underline;
                         }
 
+                        .boxtitle i {
+                            font-size: 15px;
+                            float: right;
+                        }
+
                         .runningCountTitle {
 
                         }
@@ -135,6 +143,7 @@
                                         <div class="boxtitle  {{ group[0].StateClass }}">
                                             <a href="/application/{{ group[0].Name }}/overview"
                                                ng-bind="group[0].Name"></a>
+                                            <i ng-if="group[0].Running == 0 && group[0].Enabled == false" ng-click="main.delete_application(group[0].Name)" class="fa fa-trash icon-fixed-width" aria-hidden="true"></i>
                                         </div>
                                         <div class="boxbody">
                                             <div><span class="statusTitle">Status:</span> <span
@@ -154,6 +163,7 @@
                                         <div class="boxtitle  {{ group[0].StateClass }}">
                                             <a href="/application/{{ group[1].Name }}/overview"
                                                ng-bind="group[1].Name"></a>
+                                            <i ng-if="group[1].Running == 0 && group[1].Enabled == false" ng-click="main.delete_application(group[1].Name)"  class="fa fa-trash icon-fixed-width" aria-hidden="true"></i>
                                         </div>
                                         <div class="boxbody">
                                             <div><span class="statusTitle">Status:</span> <span
@@ -173,6 +183,7 @@
                                         <div class="boxtitle  {{ group[0].StateClass }}">
                                             <a href="/application/{{ group[2].Name }}/overview"
                                                ng-bind="group[2].Name"></a>
+                                            <i ng-if="group[2].Running == 0 && group[2].Enabled == false" ng-click="main.delete_application(group[2].Name)" class="fa fa-trash icon-fixed-width" aria-hidden="true"></i>
                                         </div>
                                         <div class="boxbody">
                                             <div><span class="statusTitle">Status:</span> <span
@@ -370,6 +381,12 @@
                         $("#addappmodal").modal("hide");
                     });
                 };
+
+                self.delete_application = function (name) {
+                    $http.delete("/application/" + name).then(function (response) {
+                        get_applications();
+                    });
+                }
 
                 self.show__all_applications();
             }]);

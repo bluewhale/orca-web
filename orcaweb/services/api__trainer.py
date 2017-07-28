@@ -20,6 +20,16 @@ def __authenticated_get_request(uri):
     return json.loads(response.text)
 
 
+def __authenticated_delete_request(uri):
+    from orcaweb.routes_base import session__get_hostname
+
+    response = requests.delete("%s/%s&token=%s" % (session__get_hostname(), uri, current_user.get_id()))
+    print "%s/%s&token=%s" % (session__get_hostname(), uri, current_user.get_id())
+    if response.status_code == 403:
+        raise NoSession("Invalid or no session")
+    return json.loads(response.text)
+
+
 def __authenticated_post_request(uri, data):
     from orcaweb.routes_base import session__get_hostname
 
@@ -67,6 +77,10 @@ def get__configuration__applications_app(name):
 
 def set__configuration__applications_app(name, object):
     __authenticated_post_request("config/applications?application=%s" % (name), data=json.dumps(object))
+
+
+def delete__configuration__applications_app(name):
+    __authenticated_delete_request("config/applications?application=%s" % (name))
 
 
 def get__configuration__applications_app__config(name):

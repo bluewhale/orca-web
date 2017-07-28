@@ -317,6 +317,13 @@ def route_application__add():
     return ""
 
 
+@app.route("/application/<name>", methods=["DELETE"])
+@login_required
+def route_application__delete(name):
+    api__trainer.delete__configuration__applications_app(name)
+    return ""
+
+
 @app.route("/server/<name>/overview")
 @login_required
 def route_server(name):
