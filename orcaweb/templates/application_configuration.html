@@ -225,7 +225,33 @@
                         <a ng-click="main.create_environment()">Add Variable</a>
                     </div>
                 </div>
-
+                <br>
+                <br>
+                <div class="configuration_row row box formbox">
+                    <div class="col-lg-4">
+                        <div class="subtitle">Data Queues</div>
+                        <div class="subtext">
+                            Configure data queues to work with the application.
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="form-group form-inline"
+                             ng-repeat="mapping in main.application.DataQueue">
+                            <input size="50" type="text" placeholder="Queue Name" class="form-control" ng-model="mapping.Name">
+                            <input size="15" type="text" placeholder="Alert Threshold" class="form-control" ng-model="mapping.AlertThreshold">
+                            <a ng-click="main.delete_queue(mapping.Name)"><i
+                                class="glyphicon glyphicon-remove"></i></a>
+                            <br>
+                            <input size="50" type="text" placeholder="Rogue Queue Name" class="form-control" ng-model="mapping.RogueName">
+                            <input size="15" type="text" placeholder="Alert Threshold" class="form-control" ng-model="mapping.RogueAlertThreshold">
+                            <br>
+                            <input type="checkbox" id="queueProducer" class="form-control" ng-model="mapping.Producer">
+                            <label for="queueProducer">App is Producer for this Queue</label>
+                            <br>
+                        </div>
+                        <a ng-click="main.create_queue()">Add Queue</a>
+                    </div>
+                </div>
                 <br>
                 <div class="configuration_row row box formbox">
                     <div class="col-lg-4">
@@ -314,6 +340,30 @@
                 self.application.EnvironmentVariables.push({
                     "Key": "",
                     "Value": ""
+                })
+            };
+
+            self.delete_queue = function (Name) {
+                var new_items = [];
+                for (var i = 0; i < self.application.DataQueue.length; i++) {
+                    if (!(self.application.DataQueue[i].Name == Name)) {
+                        new_items.push(self.application.DataQueue[i]);
+                    }
+                }
+
+                self.application.DataQueue = new_items;
+            };
+
+            self.create_queue = function () {
+                if (!self.application.DataQueue) {
+                    self.application.DataQueue = []
+                }
+                self.application.DataQueue.push({
+                    "Name": "",
+                    "AlertThreshold": "",
+                    "RogueName": "",
+                    "RogueAlertThreshold": "",
+                    "Producer": false
                 })
             };
 
