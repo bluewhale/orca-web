@@ -15,7 +15,7 @@
 
 <link rel="shortcut icon" href="{{ url_for('static', filename="images/orca1_black.png") }}">
 
-<title>Orca Dashboard</title>
+<title>{{ g.region }} @ Orca</title>
 </head>
 
 <body>
@@ -329,7 +329,7 @@
 </script>
 
 <div id="topnav">
-    <div class="orcatitle"><img src="{{ url_for('static', filename="images/orca1.png") }}" style="width: 30px;"> orca</div>
+    <div class="orcatitle"><img src="{{ url_for('static', filename="images/orca1.png") }}" style="width: 30px;"> orca <i>@ {{ g.region }}</i></div>
     <div class="leftnavitem">
         <div id="navitem_apps" class="navitem"><a href="/">Apps</a></div>
         <div id="navitem_servers" class="navitem"><a href="/servers">Servers</a></div>

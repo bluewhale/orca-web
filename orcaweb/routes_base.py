@@ -26,6 +26,7 @@ class User:
     def get_id(self):
         return self.id
 
+
 @app.route("/check")
 def check():
     return "OK"
@@ -36,6 +37,7 @@ def before():
     if current_user.is_authenticated():
         flask.g.server = session__get_hostname()
         flask.g.username = session__get_username()
+        flask.g.region = session__get_region()
 
 
 
@@ -48,6 +50,13 @@ def session__get_username():
 
 def session__set_username(username):
     flask.session["username"] = username
+
+
+def session__get_region():
+    return flask.session.get("region")
+
+def session__set_region(region):
+    flask.session["region"] = region
 
 
 @login_manager.user_loader
@@ -67,6 +76,10 @@ def login():
             # user should be an instance of your `User` class
             login_user(User(authenticate_res, flask.request.form.get("username")))
             session__set_username(flask.request.form.get("username"))
+
+            settings = api__trainer.get__settings()
+            if settings: session__set_region(settings["EnvName"])
+
             return flask.redirect("/")
     return render_template("login.html")
 
