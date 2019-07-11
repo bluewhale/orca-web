@@ -101,6 +101,13 @@ def ajax__route_servers():
     return flask.jsonify(servers=ret)
 
 
+@app.route("/ajax/servers/<server_id>", methods=["DELETE"])
+@login_required
+def ajax__route_servers_terminate(server_id):
+    api__trainer.get__status__server_requesttermination(server_id)
+    return flask.jsonify(dict())
+
+
 @app.route("/ajax/settings", methods=["POST"])
 @login_required
 def ajax__route_settings_post():
@@ -354,6 +361,7 @@ def route_application__set(name):
     existing_configuration["DockerConfig"]["Tag"] = request.form.get("Tag")
     existing_configuration["DockerConfig"]["Repository"] = request.form.get("Repository")
     existing_configuration["DockerConfig"]["Reference"] = request.form.get("Reference")
+    existing_configuration["InstanceType"] = request.form.get("InstanceType")
 
     existing_configuration["Needs"]["MemoryNeeds"] = int(request.form.get("MemoryNeeds"))
     existing_configuration["Needs"]["CpuNeeds"] = int(request.form.get("CpuNeeds"))
@@ -373,6 +381,7 @@ def route_application__set_configuration(name):
     existing_configuration["DockerConfig"]["Tag"] = request.form.get("Tag")
     existing_configuration["DockerConfig"]["Repository"] = request.form.get("Repository")
     existing_configuration["DockerConfig"]["Reference"] = request.form.get("Reference")
+    existing_configuration["InstanceType"] = request.form.get("InstanceType")
 
     existing_configuration["Needs"]["MemoryNeeds"] = int(request.form.get("MemoryNeeds"))
     existing_configuration["Needs"]["CpuNeeds"] = int(request.form.get("CpuNeeds"))

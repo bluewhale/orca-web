@@ -128,12 +128,12 @@
                 window.push_loading();
 
                 return $http.get("/ajax/server/{{ name }}").then(
-                        function (response) {
-                            window.pop_loading();
-                            self.server = response.data.server;
-                        }, function (err) {
-                            console.log("err")
-                        }
+                    function (response) {
+                        window.pop_loading();
+                        self.server = response.data.server;
+                    }, function (err) {
+                        console.log("err")
+                    }
                 )
             };
 
@@ -141,148 +141,148 @@
                 window.push_loading();
 
                 return $http.get("/ajax/server/{{ name }}/memory").then(
-                        function (response) {
+                    function (response) {
                         window.pop_loading();
 
-                            var cpu_usage = [];
-                            for (var i = 0; i < response.data.memory.length; i++) {
-                                cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Cpu"] / 100]);
-                            }
-
-                            var memory_usage = [];
-                            for (var i = 0; i < response.data.memory.length; i++) {
-                                memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Mbytes"]]);
-                            }
-
-                            var network_usage = [];
-                            for (var i = 0; i < response.data.memory.length; i++) {
-                                network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Network"]]);
-                            }
-
-                            var hdd_usage = [];
-                            for (var i = 0; i < response.data.memory.length; i++) {
-                                hdd_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["HardDiskUsagePercent"] / 100]);
-                            }
-
-                            Highcharts.chart('cpu_graph', {
-                                chart: {
-                                    type: 'areaspline'
-                                },
-                                title: {text: ''},
-                                exporting: {enabled: false},
-                                credits: {enabled: false},
-                                xAxis: {
-                                    visible: true,
-                                    type: "datetime"
-                                },
-                                yAxis: {
-                                    visible: true
-                                },
-                                plotOptions: {
-                                    areaspline: {
-                                        fillOpacity: 0.5
-                                    }
-                                },
-                                series: [{
-                                    showInLegend: true,
-                                    data: cpu_usage,
-                                    marker: {
-                                        enabled: false
-                                    },
-                                    name: "CPU Running"
-                                }]
-                            });
-
-                            Highcharts.chart('memory_graph', {
-                                chart: {
-                                    type: 'areaspline'
-                                },
-                                title: {text: ''},
-                                exporting: {enabled: false},
-                                credits: {enabled: false},
-                                xAxis: {
-                                    visible: true,
-                                    type: "datetime"
-                                },
-                                yAxis: {
-                                    visible: true
-                                },
-                                plotOptions: {
-                                    areaspline: {
-                                        fillOpacity: 0.5
-                                    }
-                                },
-                                series: [{
-                                    showInLegend: true,
-                                    data: memory_usage,
-                                    marker: {
-                                        enabled: false
-                                    },
-                                    name: "MEMORY Running"
-                                }]
-                            });
-
-                            Highcharts.chart('network_graph', {
-                                chart: {
-                                    type: 'areaspline'
-                                },
-                                title: {text: ''},
-                                exporting: {enabled: false},
-                                credits: {enabled: false},
-                                xAxis: {
-                                    visible: true,
-                                    type: "datetime"
-                                },
-                                yAxis: {
-                                    visible: true
-                                },
-                                plotOptions: {
-                                    areaspline: {
-                                        fillOpacity: 0.5
-                                    }
-                                },
-                                series: [{
-                                    showInLegend: true,
-                                    data: network_usage,
-                                    marker: {
-                                        enabled: false
-                                    },
-                                    name: "Network Running"
-                                }]
-                            });
-
-                            Highcharts.chart('hdd_graph', {
-                                chart: {
-                                    type: 'areaspline'
-                                },
-                                title: {text: ''},
-                                exporting: {enabled: false},
-                                credits: {enabled: false},
-                                xAxis: {
-                                    visible: true,
-                                    type: "datetime"
-                                },
-                                yAxis: {
-                                    visible: true
-                                },
-                                plotOptions: {
-                                    areaspline: {
-                                        fillOpacity: 0.5
-                                    }
-                                },
-                                series: [{
-                                    showInLegend: true,
-                                    data: hdd_usage,
-                                    marker: {
-                                        enabled: false
-                                    },
-                                    name: "HDD Percentage Running"
-                                }]
-                            });
-
-                        }, function (err) {
-                            console.log("err")
+                        var cpu_usage = [];
+                        for (var i = 0; i < response.data.memory.length; i++) {
+                            cpu_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Cpu"] / 100]);
                         }
+
+                        var memory_usage = [];
+                        for (var i = 0; i < response.data.memory.length; i++) {
+                            memory_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Mbytes"]]);
+                        }
+
+                        var network_usage = [];
+                        for (var i = 0; i < response.data.memory.length; i++) {
+                            network_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["Network"]]);
+                        }
+
+                        var hdd_usage = [];
+                        for (var i = 0; i < response.data.memory.length; i++) {
+                            hdd_usage.push([moment.parseZone(response.data.memory[i]["Timestamp"]).toDate().getTime(), response.data.memory[i]["HardDiskUsagePercent"] / 100]);
+                        }
+
+                        Highcharts.chart('cpu_graph', {
+                            chart: {
+                                type: 'areaspline'
+                            },
+                            title: {text: ''},
+                            exporting: {enabled: false},
+                            credits: {enabled: false},
+                            xAxis: {
+                                visible: true,
+                                type: "datetime"
+                            },
+                            yAxis: {
+                                visible: true
+                            },
+                            plotOptions: {
+                                areaspline: {
+                                    fillOpacity: 0.5
+                                }
+                            },
+                            series: [{
+                                showInLegend: true,
+                                data: cpu_usage,
+                                marker: {
+                                    enabled: false
+                                },
+                                name: "CPU Running"
+                            }]
+                        });
+
+                        Highcharts.chart('memory_graph', {
+                            chart: {
+                                type: 'areaspline'
+                            },
+                            title: {text: ''},
+                            exporting: {enabled: false},
+                            credits: {enabled: false},
+                            xAxis: {
+                                visible: true,
+                                type: "datetime"
+                            },
+                            yAxis: {
+                                visible: true
+                            },
+                            plotOptions: {
+                                areaspline: {
+                                    fillOpacity: 0.5
+                                }
+                            },
+                            series: [{
+                                showInLegend: true,
+                                data: memory_usage,
+                                marker: {
+                                    enabled: false
+                                },
+                                name: "MEMORY Running"
+                            }]
+                        });
+
+                        Highcharts.chart('network_graph', {
+                            chart: {
+                                type: 'areaspline'
+                            },
+                            title: {text: ''},
+                            exporting: {enabled: false},
+                            credits: {enabled: false},
+                            xAxis: {
+                                visible: true,
+                                type: "datetime"
+                            },
+                            yAxis: {
+                                visible: true
+                            },
+                            plotOptions: {
+                                areaspline: {
+                                    fillOpacity: 0.5
+                                }
+                            },
+                            series: [{
+                                showInLegend: true,
+                                data: network_usage,
+                                marker: {
+                                    enabled: false
+                                },
+                                name: "Network Running"
+                            }]
+                        });
+
+                        Highcharts.chart('hdd_graph', {
+                            chart: {
+                                type: 'areaspline'
+                            },
+                            title: {text: ''},
+                            exporting: {enabled: false},
+                            credits: {enabled: false},
+                            xAxis: {
+                                visible: true,
+                                type: "datetime"
+                            },
+                            yAxis: {
+                                visible: true
+                            },
+                            plotOptions: {
+                                areaspline: {
+                                    fillOpacity: 0.5
+                                }
+                            },
+                            series: [{
+                                showInLegend: true,
+                                data: hdd_usage,
+                                marker: {
+                                    enabled: false
+                                },
+                                name: "HDD Percentage Running"
+                            }]
+                        });
+
+                    }, function (err) {
+                        console.log("err")
+                    }
                 )
             };
 

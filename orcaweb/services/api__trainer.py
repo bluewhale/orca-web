@@ -180,6 +180,11 @@ def get__status__server_latest(server):
     return response
 
 
+def get__status__server_requesttermination(server):
+    response = __authenticated_get_request("state/cloud/host/terminate?host=%s" % (server))
+    return response
+
+
 def get__status__application_server_memory(server, application):
     response = __authenticated_get_request(
         "state/cloud/application/host/performance?host=%s&application=%s" % (server, application))

@@ -15,9 +15,9 @@
                 window.open_add_application = function () {
                     $("#addappmodal").modal("show");
                 };
-                 var show = () => {
+                var show = () => {
                     return false;
-                 }
+                }
             </script>
             <style>
                 .selected {
@@ -29,15 +29,15 @@
                 }
 
                 .scaling {
-                    background-color:blue !important;
+                    background-color: blue !important;
                 }
 
                 .failing {
-                    background-color:orange !important;
+                    background-color: orange !important;
                 }
 
                 .offline {
-                    background-color:red !important;
+                    background-color: red !important;
                 }
 
                 .online {
@@ -60,12 +60,15 @@
                                 ng-show="main.scaling_count > 0" class="badge" ng-bind="main.scaling_count"></span>
                         </div>
                         <div id="nav__deploying" ng-click="main.show__failing()" class="appNavItem">
-                            <i class="fa fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Failing <span
-                                ng-show="main.failing_count > 0" class="badge failing" ng-bind="main.failing_count"></span>
+                            <i class="fa fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Failing
+                            <span
+                                    ng-show="main.failing_count > 0" class="badge failing"
+                                    ng-bind="main.failing_count"></span>
                         </div>
                         <div id="nav__offline" ng-click="main.show__offline_and_warnings()" class="appNavItem">
                             <i class="fa fa-exclamation-triangle icon-fixed-width" aria-hidden="true"></i> Offline <span
-                                ng-show="main.offline_count > 0" class="badge offline" ng-bind="main.offline_count"></span>
+                                ng-show="main.offline_count > 0" class="badge offline"
+                                ng-bind="main.offline_count"></span>
                         </div>
 
                         <br><br>
@@ -79,7 +82,8 @@
                         <br><br>
                         {% raw %}
                         <div ng-repeat="(key, value) in main.affinitytags">
-                            <div id="nav__affinitytags_{{ key }}" ng-click="main.show_affinitytags(key)" class="appNavItem"><i
+                            <div id="nav__affinitytags_{{ key }}" ng-click="main.show_affinitytags(key)"
+                                 class="appNavItem"><i
                                     class="fa fa-object-group icon-fixed-width" aria-hidden="true"></i><span
                                     ng-bind="key"></span></div>
                         </div>
@@ -134,73 +138,42 @@
                         }
                     </style>
 
-                    <div class="row">
-                        {% raw %}
-                        <div style="" ng-repeat="group in main.groupedApplications">
-                            <div class="row">
-                                <div class="col-md-4" style="">
-                                    <div class="box" style="">
-                                        <div class="boxtitle  {{ group[0].StateClass }}">
-                                            <a href="/application/{{ group[0].Name }}/overview"
-                                               ng-bind="group[0].Name"></a>
-                                            <i ng-if="group[0].Running == 0 && group[0].Enabled == false" ng-click="main.delete_application(group[0].Name)" class="fa fa-trash icon-fixed-width" aria-hidden="true"></i>
-                                        </div>
-                                        <div class="boxbody">
-                                            <div><span class="statusTitle">Status:</span> <span
-                                                    ng-bind="group[0].Status"></span></div>
-                                            <hr>
-                                            <div><span class="countTitle">Running: </span> <span
-                                                    ng-bind="group[0].Running"></span></div>
-                                            <div><span class="countTitle">Desired: </span> <span
-                                                    ng-bind="group[0].DesiredDeployment"></span></div>
-                                            <div><span class="countTitle">Failed: </span> <span
-                                                    ng-bind="group[0].Failed"></span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div ng-show="group[1].Name" class="col-md-4" style="">
-                                    <div class="box" style="">
-                                        <div class="boxtitle  {{ group[0].StateClass }}">
-                                            <a href="/application/{{ group[1].Name }}/overview"
-                                               ng-bind="group[1].Name"></a>
-                                            <i ng-if="group[1].Running == 0 && group[1].Enabled == false" ng-click="main.delete_application(group[1].Name)"  class="fa fa-trash icon-fixed-width" aria-hidden="true"></i>
-                                        </div>
-                                        <div class="boxbody">
-                                            <div><span class="statusTitle">Status:</span> <span
-                                                    ng-bind="group[1].Status"></span></div>
-                                            <hr>
-                                            <div><span class="countTitle">Running: </span> <span
-                                                    ng-bind="group[1].Running"></span></div>
-                                            <div><span class="countTitle">Desired: </span> <span
-                                                    ng-bind="group[1].DesiredDeployment"></span></div>
-                                            <div><span class="countTitle">Failed: </span> <span
-                                                    ng-bind="group[1].Failed"></span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div ng-show="group[2].Name" class="col-md-4" style="">
-                                    <div class="box" style="">
-                                        <div class="boxtitle  {{ group[0].StateClass }}">
-                                            <a href="/application/{{ group[2].Name }}/overview"
-                                               ng-bind="group[2].Name"></a>
-                                            <i ng-if="group[2].Running == 0 && group[2].Enabled == false" ng-click="main.delete_application(group[2].Name)" class="fa fa-trash icon-fixed-width" aria-hidden="true"></i>
-                                        </div>
-                                        <div class="boxbody">
-                                            <div><span class="statusTitle">Status:</span> <span
-                                                    ng-bind="group[2].Status"></span></div>
-                                            <hr>
-                                            <div><span class="countTitle">Running: </span> <span
-                                                    ng-bind="group[2].Running"></span></div>
-                                            <div><span class="countTitle">Desired: </span> <span
-                                                    ng-bind="group[2].DesiredDeployment"></span></div>
-                                            <div><span class="countTitle">Failed: </span> <span
-                                                    ng-bind="group[2].Failed"></span></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="col-md-12" id="appBody">
+                        <div class="">
+                            <div class="statpill-name">Applications</div>
+                            <table class="table">
+                                <tbody>
+                                {% raw %}
+                                <tr ng-repeat="app in main.applications">
+                                    <td>
+                                        <span class="cube" ng-class="app.Temp"></span>
+                                    </td>
+
+                                    <td style="white-space: nowrap">
+                                        <a href="/application/{{ app.Name }}/overview" ng-bind="app.Name"></a>
+                                    </td>
+                                    <td>
+                                        Status - <span ng-bind="app.Status"></span>
+                                    </td>
+                                    <td>
+                                        <span class="countTitle">Running: </span> <span ng-bind="app.Running"></span>
+                                        <span class="countTitle">Desired: </span> <span
+                                            ng-bind="app.DesiredDeployment"></span>
+                                        <span class="countTitle">Failed: </span> <span ng-bind="app.Failed"></span>
+                                    </td>
+                                    <td>
+                                        <i ng-if="group[0].Running == 0 && group[0].Enabled == false"
+                                           ng-click="main.delete_application(group[0].Name)"
+                                           class="fa fa-trash icon-fixed-width" aria-hidden="true"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <div ng-show="main.servers_empty"><i>No Applications Found</i></div>
+                                </tr>
+                                {% endraw %}
+                                </tbody>
+                            </table>
                         </div>
-                        {% endraw %}
                     </div>
                 </div>
             </div>
@@ -254,44 +227,58 @@
                     self.failing_count = 0;
 
                     return $http.get("/ajax/applications/by/vpc").then(
-                            function (response) {
-                                window.pop_loading();
+                        function (response) {
+                            window.pop_loading();
 
-                                for (var i = 0; i < response.data["applications"].length; i++) {
-                                    if (filter_method == undefined || filter_method(response.data["applications"][i])) {
-                                        self.applications.push(response.data["applications"][i]);
-                                    }
-                                }
-
-                                for (var i = 0; i < self.applications.length; i += 3) {
-                                    self.groupedApplications.push([self.applications[i], self.applications[i + 1], self.applications[i + 2]]);
-                                }
-
-                                for (var i = 0; i < self.applications.length; i++) {
-                                    $.each(self.applications[i]["Config"], function (key, value) {
-                                        self.networks[value["Network"]] = true;
-
-                                        if (value["GroupingTag"].length > 0) {
-                                            self.affinitytags[value["GroupingTag"]] = true
-                                        }
-                                    });
-                                }
-
-                                for (var i = 0; i < self.applications.length; i++) {
-                                    if (self.applications[i]["Running"] == 0) {
-                                        self.offline_count += 1;
-                                    }
-                                    if (self.applications[i]["Running"] != self.applications[i]["DesiredDeployment"]) {
-                                        self.scaling_count += 1;
+                            for (var i = 0; i < response.data["applications"].length; i++) {
+                                if (filter_method == undefined || filter_method(response.data["applications"][i])) {
+                                    let application = response.data["applications"][i];
+                                    if(application.Status === "Ok"){
+                                        application["Temp"] = "c_cold";
                                     }
 
-                                    if(self.applications[i]["Failed"] > 0){
-                                        self.failing_count += 1
+                                    if (application["Running"] != application["DesiredDeployment"]){
+                                        application["Temp"]= "b_warm";
                                     }
+
+                                    if(application["Failed"] > 0){
+                                        application["Temp"] = "a_hot";
+                                    }
+
+                                    if(application["Running"] == 0 && application["DesiredDeployment"] == 0 ){
+                                        application["Temp"] = "c_dead";
+                                    }
+
+                                    console.log(application);
+                                    self.applications.push(application);
                                 }
-                            }, function (err) {
-                                console.log("err")
                             }
+
+                            for (var i = 0; i < self.applications.length; i++) {
+                                $.each(self.applications[i]["Config"], function (key, value) {
+                                    self.networks[value["Network"]] = true;
+
+                                    if (value["GroupingTag"].length > 0) {
+                                        self.affinitytags[value["GroupingTag"]] = true
+                                    }
+                                });
+                            }
+
+                            for (var i = 0; i < self.applications.length; i++) {
+                                if (self.applications[i]["Running"] == 0) {
+                                    self.offline_count += 1;
+                                }
+                                if (self.applications[i]["Running"] != self.applications[i]["DesiredDeployment"]) {
+                                    self.scaling_count += 1;
+                                }
+
+                                if (self.applications[i]["Failed"] > 0) {
+                                    self.failing_count += 1
+                                }
+                            }
+                        }, function (err) {
+                            console.log("err")
+                        }
                     )
                 };
 
@@ -366,7 +353,7 @@
                     $("#nav__affinitytags_" + network).addClass("selected");
 
                     get_applications(function (item) {
-                        if(item["Failed"] > 0){
+                        if (item["Failed"] > 0) {
                             return true
                         }
 

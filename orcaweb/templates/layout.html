@@ -144,7 +144,7 @@
         text-decoration: none;
     }
 
-        .topnavtitle {
+    .topnavtitle {
         display: inline;
     }
 
@@ -160,6 +160,30 @@
     .statpill-name {
         padding-bottom: 20px;
     }
+
+    .a_hot {
+        background: #FF0000
+    }
+
+    .b_warm {
+        background: #FFA500
+    }
+
+    .c_cold {
+        background: #3CBC3C
+    }
+
+    .c_dead {
+        background: gray
+    }
+
+    .cube {
+        float: left;
+        width: 15px;
+        height: 25px;
+        border: 1px solid rgba(0, 0, 0, .2);
+    }
+
 
 </style>
 
@@ -329,7 +353,8 @@
 </script>
 
 <div id="topnav">
-    <div class="orcatitle"><img src="{{ url_for('static', filename="images/orca1.png") }}" style="width: 30px;"> orca <i>@ {{ g.region }}</i></div>
+    <div class="orcatitle"><img src="{{ url_for('static', filename="images/orca1.png") }}" style="width: 30px;"> orca
+        <i>@ {{ g.region }}</i></div>
     <div class="leftnavitem">
         <div id="navitem_apps" class="navitem"><a href="/">Apps</a></div>
         <div id="navitem_servers" class="navitem"><a href="/servers">Servers</a></div>

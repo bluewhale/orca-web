@@ -18,21 +18,6 @@
                 .selected {
                     background-color: whitesmoke;
                 }
-                .cube {
-                    float: left;
-                    width: 15px;
-                    height: 25px;
-                    border: 1px solid rgba(0, 0, 0, .2);
-                }
-                .a_hot {
-                    background: #FF0000
-                }
-                .b_warm {
-                    background: #FFA500
-                }
-                .c_cold {
-                    background: #3CBC3C
-                }
             </style>
             <div class="row">
                 <div class="col-md-2">
@@ -87,19 +72,28 @@
                             <tbody>
                             {% raw %}
                             <tr ng-repeat="server in main.servers">
-                                <td>
+                                <td nowrap>
                                     <span class="cube" ng-class="server.Temp"></span>
                                 </td>
-                                <td style="white-space: nowrap"><i class="fa fa-server"></i> <a
-                                        href="/server/{{ server.Id }}/overview" ng-bind="server.Id"></a></td>
-                                <td>
+                                <td nowrap style="white-space: nowrap"><i class="fa fa-server"></i> <a
+                                        href="/server/{{ server.Id }}/overview" ng-bind="server.Ip"></a></td>
+                                <td nowrap>
                                     <span ng-bind="server.State"></span>
                                 </td>
-                                <td><span ng-bind="server.Ip"></span></td>
-                                <td><span ng-bind="server.Network"></span></td>
-                                <td>
+                                <td nowrap>
                                     <span ng-show="server.SpotInstance">Spot</span>
                                     <span ng-show="!server.SpotInstance">OnDemand</span>
+                                </td>
+                                <td nowrap>
+                                    <span ng-bind="server.InstanceType"></span>
+                                </td>
+                                <td>
+                                    <span ng-repeat="apps in server.Apps">
+                                        <span ng-bind="apps.Name"></span>,
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="#" ng-click="main.request_termination(server.Id)">Terminate</a>
                                 </td>
                             </tr>
                             <tr>
@@ -119,6 +113,11 @@
                     self.servers_empty = false;
                     self.initializing = 0;
                     self.deploying = 0;
+
+                    self.request_termination = function(server){
+                        console.log("requesting termination ", server);
+                        $http.delete("/ajax/servers/" + server);
+                    };
 
                     var get_servers = function (filter_method) {
                         window.push_loading();
