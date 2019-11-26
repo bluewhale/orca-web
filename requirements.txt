@@ -16,7 +16,7 @@ oauth2client==1.5.2
 pdfcrowd==2.7
 pygments==1.6
 python-memcached==1.57
-requests==2.2.1
+requests==2.20.0
 sqlalchemy==1.0.9
 sure==1.2.2
 tldextract==1.5.1
